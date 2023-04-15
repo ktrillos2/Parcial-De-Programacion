@@ -10,24 +10,25 @@ def iniciarSesion(usuario, contraseña):
     for i in usuarios:
         if i[0] == usuario and i[1] == contraseña:
             encontrado = True
+            admin=True
             if i[2] == "admin":
-                while True:
-                    try:
-                        preguntaAdmin = int(input("1. Cajeros\n2. Ver productos\n3. Ventas\nSelecciona una opción: "))
+                while admin:
+                        preguntaAdmin = input("1. Cajeros\n2. Ver productos\n3. Ventas\nSelecciona una opción: ")
                         if preguntaAdmin=="1":
-                            while True:
-                                try:
-                                    preguntaCajero=input("1. Eliminar Cajeros\n2. Agregar Cajero\nSelecciona una opción: ")
+                            opcionesCajeros=True
+                            while opcionesCajeros:
+                                    preguntaCajero=input("1. Eliminar Cajeros\n2. Agregar Cajero\n3. Regresar al menu anterior\nSelecciona una opción: ")
                                     if preguntaCajero=="1":
                                         ##Codigo de eliminar cajero
                                         break
                                     elif preguntaCajero=="2":
                                         ##Codigo para agregar cajero
                                         break
+                                    elif preguntaCajero=="3":
+                                        opcionesCajeros=False
+                                        break
                                     else:
                                         print("Ingresa un numero valido")
-                                except:
-                                    print("Solo se admiten números")
                             break
                         elif preguntaAdmin=="2":
                             ##codigo de productos
@@ -37,8 +38,6 @@ def iniciarSesion(usuario, contraseña):
                             break
                         else:
                             print("Ingresa un numero valido")
-                    except:            
-                        print("Solo se admiten números")     
             if i[2] == "cajero":
                 print("Ingresaste como cajero")
             if i[2] == "usuario":
