@@ -6,7 +6,12 @@ usuarios = [
 
 
 def agregarCajero():
+    existe = False
     usuario = input("Ingrese correo: ")
+    for datos in usuarios:
+        if datos[0] == usuario:
+            print("Este cajero ya existe")
+            return False
     contraseña = input("Ingrese contraseña: ")
     nombre = input("Ingrese nombre: ")
     while True:
@@ -20,7 +25,17 @@ def agregarCajero():
                 break
         else:
             print("Ingresa un documento valido")
-    usuarios.append([usuario, contraseña, "cajero", [nombre, documento, True]])
+    for datos in usuarios:
+        for i in range(len(datos[3])):
+            if documento == datos[3][1]:
+                existe = True
+    if existe == True:
+        print("Este cajero ya existe")
+        return False
+    else:
+        usuarios.append([usuario, contraseña, "cajero", [nombre, documento, True]])
+        print("Cajero registrado exitosamente")
+        return True
 
 
 def eliminarCajero():
@@ -70,10 +85,10 @@ def iniciarSesion(usuario, contraseña):
                                 if eliminarCajero() == True:
                                     break
                             elif preguntaCajero == "2":
-                                agregarCajero()
-                                break
+                                if agregarCajero() == True:
+                                    break
                             elif preguntaCajero == "3":
-                                ##codigo para modificar cajero
+                                # codigo para modificar cajero
                                 break
                             elif preguntaCajero == "4":
                                 break
