@@ -15,7 +15,19 @@ def iniciarSesion(usuario, contraseña):
                     try:
                         preguntaAdmin = int(input("1. Cajeros\n2. Ver productos\n3. Ventas\nSelecciona una opción: "))
                         if preguntaAdmin=="1":
-                            ##codigo de cajero
+                            while True:
+                                try:
+                                    preguntaCajero=input("1. Eliminar Cajeros\n2. Agregar Cajero\nSelecciona una opción: ")
+                                    if preguntaCajero=="1":
+                                        ##Codigo de eliminar cajero
+                                        break
+                                    elif preguntaCajero=="2":
+                                        ##Codigo para agregar cajero
+                                        break
+                                    else:
+                                        print("Ingresa un numero valido")
+                                except:
+                                    print("Solo se admiten números")
                             break
                         elif preguntaAdmin=="2":
                             ##codigo de productos
@@ -26,7 +38,7 @@ def iniciarSesion(usuario, contraseña):
                         else:
                             print("Ingresa un numero valido")
                     except:            
-                        print("Ingresa un numero valido")     
+                        print("Solo se admiten números")     
             if i[2] == "cajero":
                 print("Ingresaste como cajero")
             if i[2] == "usuario":
