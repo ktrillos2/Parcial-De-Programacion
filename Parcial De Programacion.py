@@ -15,36 +15,51 @@ def validarCorreo(correo):
 
 
 def agregarCajero():
-    existe = False
-    usuario = input("Ingrese correo: ").strip()
-    for datos in usuarios:
-        if datos[0] == usuario:
-            print("Este cajero ya existe")
-            return False
-    contraseña = input("Ingrese contraseña: ").strip()
-    nombre = input("Ingrese nombre: ").strip()
     while True:
-        documento = input("Ingrese documento: ").strip()
-        if documento.isdigit():
-            if len(documento) < 8:
-                print("Documento muy corto")
-            elif len(documento) > 10:
-                print("Documento muy largo")
-            else:
-                break
+        usuario = input("Ingrese correo: ").strip()
+        if validarCorreo(usuario) == True:
+            for datos in usuarios:
+                if datos[0] == usuario:
+                    print("Este cajero ya existe")
+                    return False
+            contraseña = input("Ingrese contraseña: ").strip()
+            nombre = input("Ingrese nombre: ").strip()
+            while True:
+                existe=False
+                documento = input("Ingrese documento: ").strip()
+                if documento.isdigit():
+                    if len(documento) < 8:
+                        print("Documento muy corto")
+                    elif len(documento) > 10:
+                        print("Documento muy largo")
+                    else:
+                        for datos in usuarios:
+                            for i in range(len(datos[3])):
+                                if documento == datos[3][1]:
+                                    existe = True
+                        if existe==True:
+                            while True:
+                                preguntaSalir = (
+                                    input(
+                                        "1. Salir al menu anterior\n2. Ingresar otro documento\nEl documento que ingresaste ya existe en nuestro sistema. Por favor, selecciona una de las siguientes opciones ingresando el número correspondiente : "
+                                    )
+                                    .strip()
+                                    .lower()
+                                )
+                                if preguntaSalir == "1":
+                                    return False
+                                elif preguntaSalir == "2":
+                                    break
+                                else:
+                                    print("Ingresa una opción valida")
+                        else:
+                            usuarios.append([usuario, contraseña, "cajero", [nombre, documento, True]])
+                            print("Cajero registrado exitosamente")
+                            return True
+                else:
+                    print("Ingresa un documento valido")
         else:
-            print("Ingresa un documento valido")
-    for datos in usuarios:
-        for i in range(len(datos[3])):
-            if documento == datos[3][1]:
-                existe = True
-    if existe == True:
-        print("Este cajero ya existe")
-        return False
-    else:
-        usuarios.append([usuario, contraseña, "cajero", [nombre, documento, True]])
-        print("Cajero registrado exitosamente")
-        return True
+            print("Ingresa un correo valido")
 
 
 def eliminarCajero():
