@@ -18,10 +18,36 @@ def agregarCajero():
     while True:
         usuario = input("Ingrese correo: ").strip()
         if validarCorreo(usuario) == True:
-            for datos in usuarios:
-                if datos[0] == usuario:
-                    print("Este cajero ya existe")
-                    return False
+            correoValido = True
+            while correoValido==True:
+                existeCorreo = False
+                for datos in usuarios:
+                    if datos[0] == usuario:
+                        existeCorreo = True
+                if existeCorreo == True:
+                    while True:
+                        preguntaCorreoSalir = (
+                            input(
+                                "1. Salir al menu anterior\n2. Ingresar otro correo\nEl correo que ingresaste ya existe en nuestro sistema. Por favor, selecciona una de las siguientes opciones ingresando el número correspondiente : "
+                            )
+                            .strip()
+                            .lower()
+                        )
+                        if preguntaCorreoSalir == "1":
+                            return False
+                        elif preguntaCorreoSalir == "2":
+                            break
+                        else:
+                            print("Ingresa una opción valida")
+                    usuario = input("Ingrese correo: ").strip()
+                    if validarCorreo(usuario) == False:
+                        print("Ingresa un correo valido")
+                        correoValido = True
+                    else:
+                        correoValido = True
+                else:
+                    correoValido = False
+                    break
             contraseña = input("Ingrese contraseña: ").strip()
             nombre = input("Ingrese nombre: ").strip()
             while True:
