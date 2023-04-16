@@ -25,7 +25,7 @@ def agregarCajero():
             contraseña = input("Ingrese contraseña: ").strip()
             nombre = input("Ingrese nombre: ").strip()
             while True:
-                existe=False
+                existe = False
                 documento = input("Ingrese documento: ").strip()
                 if documento.isdigit():
                     if len(documento) < 8:
@@ -37,7 +37,7 @@ def agregarCajero():
                             for i in range(len(datos[3])):
                                 if documento == datos[3][1]:
                                     existe = True
-                        if existe==True:
+                        if existe == True:
                             while True:
                                 preguntaSalir = (
                                     input(
@@ -53,7 +53,14 @@ def agregarCajero():
                                 else:
                                     print("Ingresa una opción valida")
                         else:
-                            usuarios.append([usuario, contraseña, "cajero", [nombre, documento, True]])
+                            usuarios.append(
+                                [
+                                    usuario,
+                                    contraseña,
+                                    "cajero",
+                                    [nombre, documento, True],
+                                ]
+                            )
                             print("Cajero registrado exitosamente")
                             return True
                 else:
@@ -63,31 +70,40 @@ def agregarCajero():
 
 
 def eliminarCajero():
-    encontrado = False
     while True:
-        documento = input("Ingrese documento del cajero a eliminar: ").strip()
+        existe = False
+        documento = input("Ingrese documento: ").strip()
         if documento.isdigit():
             if len(documento) < 8:
                 print("Documento muy corto")
             elif len(documento) > 10:
                 print("Documento muy largo")
             else:
-                break
+                for datos in usuarios:
+                    for i in range(len(datos[3])):
+                        if documento == datos[3][1]:
+                            existe = True
+                            datos[3][2] = False
+                if existe == False:
+                    while True:
+                        preguntaSalir = (
+                            input(
+                                "1. Salir al menu anterior\n2. Ingresar otro documento\nEl documento que ingresaste ya existe en nuestro sistema. Por favor, selecciona una de las siguientes opciones ingresando el número correspondiente : "
+                            )
+                            .strip()
+                            .lower()
+                        )
+                        if preguntaSalir == "1":
+                            return False
+                        elif preguntaSalir == "2":
+                            break
+                        else:
+                            print("Ingresa una opción valida")
+                else:
+                    print("Cajero eliminado satisfactoriamente")
+                    return True
         else:
             print("Ingresa un documento valido")
-
-    for usuario in usuarios:
-        for i in range(len(usuario[3])):
-            if documento == usuario[3][1]:
-                encontrado = True
-                usuario[3][2] = False
-
-    if encontrado == False:
-        print("Documento no encontrado")
-        return False
-    else:
-        print(usuarios)
-        return True
 
 
 def modificarCajero():
