@@ -1,4 +1,4 @@
-#librería para verificar si un input es un correo
+# librería para verificar si un input es un correo
 import re
 
 # [correo,contraseña,rol,[nombre,documento,activo o no activo]]
@@ -8,9 +8,11 @@ usuarios = [
     ["cajero2@email.com", "cajero2", "cajero", ["prueba2", "1234567891", True]],
 ]
 
+
 def validarCorreo(correo):
     patron = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return bool(re.match(patron, correo))
+
 
 def agregarCajero():
     existe = False
@@ -40,8 +42,7 @@ def agregarCajero():
         print("Este cajero ya existe")
         return False
     else:
-        usuarios.append([usuario, contraseña, "cajero",
-                        [nombre, documento, True]])
+        usuarios.append([usuario, contraseña, "cajero", [nombre, documento, True]])
         print("Cajero registrado exitosamente")
         return True
 
@@ -77,11 +78,13 @@ def eliminarCajero():
 def modificarCajero():
     while True:
         pregunta = input(
-            "1. Correo\n2. Contraseña\n3. Nombre\n4. Documento\nPor favor, seleccione el número del campo que desea modificar: ").strip()
+            "1. Correo\n2. Contraseña\n3. Nombre\n4. Documento\nPor favor, seleccione el número del campo que desea modificar: "
+        ).strip()
         if pregunta == "1":
             while True:
                 documentoUsuario = input(
-                    "Ingrese documento del cajero a modificar: ").strip()
+                    "Ingrese documento del cajero a modificar: "
+                ).strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -91,20 +94,32 @@ def modificarCajero():
                         break
                 else:
                     print("Ingresa un documento valido")
-            encontrado=False
+            encontrado = False
             for usuario in usuarios:
                 for i in range(len(usuario[3])):
                     if documentoUsuario == usuario[3][1]:
                         encontrado = True
-                        
-            if encontrado==False:
+
+            if encontrado == False:
                 print("Documento no encontrado")
             else:
                 print("Usuario Encontrado")
                 while True:
-                    nuevoCorreo=input("Ingresa nuevo correo: ").strip().lower()
-                    if validarCorreo(nuevoCorreo)==True:
-                        ##continuacion de codigo cuando el correo se valide que sea valido
+                    nuevoCorreo = input("Ingresa nuevo correo: ").strip().lower()
+                    if validarCorreo(nuevoCorreo) == True:
+                        for usuario in usuarios:
+                            for i in range(len(usuario[3])):
+                                if documentoUsuario == usuario[3][1]:
+                                    usuario[0] = nuevoCorreo
+                                    print(
+                                        "El usuario ",
+                                        usuario[3][0],
+                                        " con documento ",
+                                        documentoUsuario,
+                                        " , se le actualizo el correo, y el nuevo correo es: ",
+                                        nuevoCorreo,
+                                    )
+                                    return True
                         break
                     else:
                         print("Ingresa un correo valido")
@@ -132,7 +147,7 @@ def iniciarSesion(usuario, contraseña):
                     if preguntaAdmin == "1":
                         while True:
                             preguntaCajero = input(
-                                "1. Eliminar Cajeros\n2. Agregar Cajero\n3. Modificar Cajero\n4. Regresar al menu anterior\nSelecciona una opción: "
+                                "1. Eliminar Cajeros\n2. Agregar Cajero\n3. Modificar Cajero\n4. Ver cajeros\n5. Regresar al menu anterior\nSelecciona una opción: "
                             ).strip()
                             if preguntaCajero == "1":
                                 if eliminarCajero() == True:
@@ -141,9 +156,13 @@ def iniciarSesion(usuario, contraseña):
                                 if agregarCajero() == True:
                                     break
                             elif preguntaCajero == "3":
-                                # codigo para modificar cajero
-                                break
+                                if modificarCajero() == True:
+                                    break
                             elif preguntaCajero == "4":
+                                for usuario in usuarios:
+                                    print(usuario)
+                                break
+                            elif preguntaCajero == "5":
                                 break
                             else:
                                 print("Ingresa un numero valido")
@@ -161,9 +180,13 @@ def iniciarSesion(usuario, contraseña):
                 print("Ingresaste como usuario")
     if not encontrado:
         while True:
-            pregunta = input(
-                "Lo siento, no pudimos encontrar una cuenta con los datos de inicio de sesión que proporcionaste. ¿Deseas crear una cuenta nueva? (si/no) "
-            ).strip().lower()
+            pregunta = (
+                input(
+                    "Lo siento, no pudimos encontrar una cuenta con los datos de inicio de sesión que proporcionaste. ¿Deseas crear una cuenta nueva? (si/no) "
+                )
+                .strip()
+                .lower()
+            )
             if pregunta == "si":
                 # Aqui va codigo para agregar a una persona
                 break
