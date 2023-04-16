@@ -140,7 +140,7 @@ def modificarCajero():
         if pregunta == "1":
             while True:
                 documentoUsuario = input(
-                    "Ingrese documento del cajero a modificar: "
+                    "Ingrese documento del cajero: "
                 ).strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
@@ -182,10 +182,127 @@ def modificarCajero():
                         print("Ingresa un correo valido")
             break
         elif pregunta == "2":
+            while True:
+                documentoUsuario = input(
+                    "Ingrese documento del cajero: "
+                ).strip()
+                if documentoUsuario.isdigit():
+                    if len(documentoUsuario) < 8:
+                        print("documento muy corto")
+                    elif len(documentoUsuario) > 10:
+                        print("documento muy largo")
+                    else:
+                        break
+                else:
+                    print("Ingresa un documento valido")
+            encontrado = False
+            for usuario in usuarios:
+                for i in range(len(usuario[3])):
+                    if documentoUsuario == usuario[3][1]:
+                        encontrado = True
+
+            if encontrado == False:
+                print("Documento no encontrado")
+            else:
+                print("Usuario Encontrado")
+                while True:
+                    nuevaContraseña = input("Ingresa nueva contraseña: ").strip().lower()
+                    for usuario in usuarios:
+                        for i in range(len(usuario[3])):
+                            if documentoUsuario == usuario[3][1]:
+                                usuario[1] = nuevaContraseña
+                                print(
+                                    "El usuario ",
+                                    usuario[3][0],
+                                    " con documento ",
+                                    documentoUsuario,
+                                    " , se le actualizo la contraseña, y la nueva contraseña es: ",
+                                    nuevaContraseña,
+                                )
+                                return True
+                    break
             break
         elif pregunta == "3":
+            while True:
+                documentoUsuario = input(
+                    "Ingrese documento del cajero: "
+                ).strip()
+                if documentoUsuario.isdigit():
+                    if len(documentoUsuario) < 8:
+                        print("documento muy corto")
+                    elif len(documentoUsuario) > 10:
+                        print("documento muy largo")
+                    else:
+                        break
+                else:
+                    print("Ingresa un documento valido")
+            encontrado = False
+            for usuario in usuarios:
+                for i in range(len(usuario[3])):
+                    if documentoUsuario == usuario[3][1]:
+                        encontrado = True
+
+            if encontrado == False:
+                print("Documento no encontrado")
+            else:
+                print("Usuario Encontrado")
+                while True:
+                    nuevoNombre = input("Ingresa nuevo nombre: ").strip().lower()
+                    for usuario in usuarios:
+                        for i in range(len(usuario[3])):
+                            if documentoUsuario == usuario[3][1]:
+                                usuario[3][0] = nuevoNombre
+                                print(
+                                    "El usuario ",
+                                    usuario[3][0],
+                                    " con documento ",
+                                    documentoUsuario,
+                                    " , se le actualizo el nombre, y el nuevo nombre es: ",
+                                    nuevoNombre,
+                                )
+                                return True
+                    break
             break
         elif pregunta == "4":
+            while True:
+                documentoUsuario = input(
+                    "Ingrese documento del cajero: "
+                ).strip()
+                if documentoUsuario.isdigit():
+                    if len(documentoUsuario) < 8:
+                        print("documento muy corto")
+                    elif len(documentoUsuario) > 10:
+                        print("documento muy largo")
+                    else:
+                        break
+                else:
+                    print("Ingresa un documento valido")
+            encontrado = False
+            for usuario in usuarios:
+                for i in range(len(usuario[3])):
+                    if documentoUsuario == usuario[3][1]:
+                        encontrado = True
+
+            if encontrado == False:
+                print("Documento no encontrado")
+            else:
+                print("Usuario Encontrado")
+                while True:
+                    nuevoDocumento = input("Ingresa nuevo documento: ").strip().lower()
+                    for usuario in usuarios:
+                        for i in range(len(usuario[3])):
+                            if documentoUsuario == usuario[3][1]:
+                                usuario[3][1] = nuevoDocumento
+                                print(
+                                    "El usuario ",
+                                    usuario[3][0],
+                                    " con documento ",
+                                    documentoUsuario,
+                                    " , se le actualizo el documento, y el nuevo documento es: ",
+                                    nuevoDocumento,
+                                )
+                                return True
+                    break
             break
         else:
             print("Ingresa una opción valida")
