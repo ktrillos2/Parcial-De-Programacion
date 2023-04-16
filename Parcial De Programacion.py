@@ -1,3 +1,4 @@
+# [correo,contraseña,rol,[nombre,documento,activo o no activo]]
 usuarios = [
     ["admin@email.com", "admin123", "admin", []],
     ["cajero1@email.com", "cajero1", "cajero", ["prueba", "123456789", True]],
@@ -7,15 +8,15 @@ usuarios = [
 
 def agregarCajero():
     existe = False
-    usuario = input("Ingrese correo: ")
+    usuario = input("Ingrese correo: ").strip()
     for datos in usuarios:
         if datos[0] == usuario:
             print("Este cajero ya existe")
             return False
-    contraseña = input("Ingrese contraseña: ")
-    nombre = input("Ingrese nombre: ")
+    contraseña = input("Ingrese contraseña: ").strip()
+    nombre = input("Ingrese nombre: ").strip()
     while True:
-        documento = input("Ingrese documento: ")
+        documento = input("Ingrese documento: ").strip()
         if documento.isdigit():
             if len(documento) < 8:
                 print("Documento muy corto")
@@ -33,7 +34,8 @@ def agregarCajero():
         print("Este cajero ya existe")
         return False
     else:
-        usuarios.append([usuario, contraseña, "cajero", [nombre, documento, True]])
+        usuarios.append([usuario, contraseña, "cajero",
+                        [nombre, documento, True]])
         print("Cajero registrado exitosamente")
         return True
 
@@ -41,7 +43,7 @@ def agregarCajero():
 def eliminarCajero():
     encontrado = False
     while True:
-        documento = input("Ingrese documento del cajero a eliminar: ")
+        documento = input("Ingrese documento del cajero a eliminar: ").strip()
         if documento.isdigit():
             if len(documento) < 8:
                 print("Documento muy corto")
@@ -66,6 +68,44 @@ def eliminarCajero():
         return True
 
 
+def modificarCajero():
+    while True:
+        pregunta = input(
+            "1. Correo\n2. Contraseña\n3. Nombre\n4. Documento\nPor favor, seleccione el número del campo que desea modificar: ").strip()
+        if pregunta == "1":
+            while True:
+                documentoUsuario = input(
+                    "Ingrese documento del cajero a modificar: ").strip()
+                if documentoUsuario.isdigit():
+                    if len(documentoUsuario) < 8:
+                        print("documento muy corto")
+                    elif len(documentoUsuario) > 10:
+                        print("documento muy largo")
+                    else:
+                        break
+                else:
+                    print("Ingresa un documento valido")
+            encontrado=False
+            for usuario in usuarios:
+                for i in range(len(usuario[3])):
+                    if documentoUsuario == usuario[3][1]:
+                        encontrado = True
+                        
+            if encontrado==False:
+                print("Documento no encontrado")
+            else:
+                nuevoCorreo=input("Ingresa nuevo correo: ").strip()
+            break
+        elif pregunta == "2":
+            break
+        elif pregunta == "3":
+            break
+        elif pregunta == "4":
+            break
+        else:
+            print("Ingresa una opción valida")
+
+
 def iniciarSesion(usuario, contraseña):
     encontrado = False
     for i in usuarios:
@@ -75,12 +115,12 @@ def iniciarSesion(usuario, contraseña):
                 while True:
                     preguntaAdmin = input(
                         "1. Cajeros\n2. Ver productos\n3. Ventas\nSelecciona una opción: "
-                    )
+                    ).strip()
                     if preguntaAdmin == "1":
                         while True:
                             preguntaCajero = input(
                                 "1. Eliminar Cajeros\n2. Agregar Cajero\n3. Modificar Cajero\n4. Regresar al menu anterior\nSelecciona una opción: "
-                            )
+                            ).strip()
                             if preguntaCajero == "1":
                                 if eliminarCajero() == True:
                                     break
@@ -110,7 +150,7 @@ def iniciarSesion(usuario, contraseña):
         while True:
             pregunta = input(
                 "Lo siento, no pudimos encontrar una cuenta con los datos de inicio de sesión que proporcionaste. ¿Deseas crear una cuenta nueva? (si/no) "
-            ).lower()
+            ).strip().lower()
             if pregunta == "si":
                 # Aqui va codigo para agregar a una persona
                 break
@@ -121,6 +161,6 @@ def iniciarSesion(usuario, contraseña):
                 print("Ingresa una opción valida")
 
 
-usuario = input("Ingrese usuario: ")
-contraseña = input("Ingrese contraseña: ")
+usuario = input("Ingrese usuario: ").strip().lower()
+contraseña = input("Ingrese contraseña: ").strip().lower()
 iniciarSesion(usuario, contraseña)
