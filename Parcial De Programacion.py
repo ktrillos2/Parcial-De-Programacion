@@ -1,3 +1,6 @@
+#librería para verificar si un input es un correo
+import re
+
 # [correo,contraseña,rol,[nombre,documento,activo o no activo]]
 usuarios = [
     ["admin@email.com", "admin123", "admin", []],
@@ -5,6 +8,9 @@ usuarios = [
     ["cajero2@email.com", "cajero2", "cajero", ["prueba2", "1234567891", True]],
 ]
 
+def validarCorreo(correo):
+    patron = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    return bool(re.match(patron, correo))
 
 def agregarCajero():
     existe = False
@@ -94,7 +100,14 @@ def modificarCajero():
             if encontrado==False:
                 print("Documento no encontrado")
             else:
-                nuevoCorreo=input("Ingresa nuevo correo: ").strip()
+                print("Usuario Encontrado")
+                while True:
+                    nuevoCorreo=input("Ingresa nuevo correo: ").strip().lower()
+                    if validarCorreo(nuevoCorreo)==True:
+                        ##continuacion de codigo cuando el correo se valide que sea valido
+                        break
+                    else:
+                        print("Ingresa un correo valido")
             break
         elif pregunta == "2":
             break
