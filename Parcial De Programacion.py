@@ -8,6 +8,115 @@ usuarios = [
     ["cajero2@email.com", "cajero2", "cajero", ["prueba2", "1234567891", True]],
 ]
 
+# ----------------------------------------------------------------Productos----------------------------------------------------------------
+tipos2 = {
+    "1": ["Vasos", True, ""],
+    "2": ["Conos", False, ""],
+    "3": ["Granizados", True, ""],
+    "4": ["Copas infantiles", True, ""],
+    "5": ["Malteadas", True, ""],
+    "6": ["Litro de helado", True, ""],
+    "7": ["Ensalada de frutas", True, ""],
+    "8": ["Fresas", True, ""],
+    "9": ["Copas", True, ""],
+    "10": ["Banana split", True, ""],
+    "11": ["Brownie con helado", True, ""],
+}
+
+
+# 1 = Vasos
+tamaños_vasos = {
+    "1": [("Sencillo", 5500), False, " -Este producto no se encuentra disponible"],
+    "2": [("Doble", 8400), True, ""],
+    "3": [("Triple", 10800), True, ""],
+}
+cantidad_bolas_vasos = {"Sencillo": 1, "Doble": 2, "Triple": 3}
+
+# 2 = Conos
+tamaños_conos = {
+    "1": [("Pequeño", 4200), True, ""],
+    "2": [("Mediano", 5500), True, ""],
+    "3": [("Doble", 8400), True, ""],
+    "4": [("Super cono", 10800), True, ""],
+    "5": [("Mega cono", 14000), True, ""],
+}
+
+cantidad_bolas_conos = {
+    "Pequeño": 1,
+    "Mediano": 1,
+    "Doble": 2,
+    "Super cono": 3,
+    "Mega cono": 4,
+}
+
+# 3 = Granizados
+tamaños_granizados = {
+    "1": [("Granizado 12 onz", 6400), True, ""],
+    "2": [("Granizado 16 onz", 8400), True, ""],
+    "3": [("Salpicon con helado", 9000), True, ""],
+    "4": [("Salpicon sin helado", 6300), True, ""],
+    "5": [("copa chocolate", 9000), True, ""],
+}
+
+# 4 = Copas infantiles
+tamaños_copas_infantiles = {
+    "1": [("Mickey", 6400), True, ""],
+    "2": [("piñata", 10800), True, ""],
+    "3": [("Fiesta", 8800), True, ""],
+    "4": [("chips", 8800), True, ""],
+}
+cantidad_bolas_copa_infantil = {"Mickey": 1, "piñata": 1, "Fiesta": 2, "chips": 2}
+
+# 5 = Malteadas
+tamaños_malteadas = {
+    "1": [("Malteada 12 onz", 10000), True, ""],
+    "2": [("Malteada 16 onz", 12000), True, ""],
+}
+
+# 6 = Litro de helado
+tamaños_litro_helado = {"1": [("Litro de helado", 27000), True, ""]}
+
+# 7 = Ensalada de frutas
+tamaños_ensalada_frutas = {
+    "1": [("personal", 10800), True, ""],
+    "2": [("para compartir sin helado", 10200), True, ""],
+    "3": [("para compartir con helado", 14500), True, ""],
+}
+
+# 8 = Fresas
+tamaños_fresas = {
+    "1": [("Fresas con crema", 11400), True, ""],
+    "2": [("Fresas con helado", 8400), True, ""],
+}
+
+# 9 = Copas
+tamaños_copas = {
+    "1": [("Exotica", 10800), True, ""],
+    "2": [("Ron o amaretto", 10800), True, ""],
+    "3": [("Caramelo", 10800), True, ""],
+    "4": [("Tropical", 10800), True, ""],
+    "5": [("Peach melba", 10800), True, ""],
+    "6": [("De la casa", 10800), True, ""],
+    "7": [("Sundae", 10800), False, "a"],
+}
+cantidad_bolas = {
+    "Exotica": 3,
+    "Ron o amaretto": 3,
+    "Caramelo": 3,
+    "Tropical": 3,
+    "Peach melba": 2,
+    "De la casa": 2,
+    "Sundae": 2,
+}
+
+# 10 = Banana split
+tamaños_banana_split = {"1": [("Banana split", 13200), True, ""]}
+
+# 11 = Brownie con helado
+tamaños_brownie = {"1": [("Brownie con helado", 13200), True, ""]}
+
+# ----------------------------------------------------------------Fin de productos----------------------------------------------------------------
+
 
 def validarCorreo(correo):
     patron = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -19,7 +128,7 @@ def agregarCajero():
         usuario = input("Ingrese correo: ").strip()
         if validarCorreo(usuario) == True:
             correoValido = True
-            while correoValido==True:
+            while correoValido == True:
                 existeCorreo = False
                 for datos in usuarios:
                     if datos[0] == usuario:
@@ -139,9 +248,7 @@ def modificarCajero():
         ).strip()
         if pregunta == "1":
             while True:
-                documentoUsuario = input(
-                    "Ingrese documento del cajero: "
-                ).strip()
+                documentoUsuario = input("Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -162,7 +269,7 @@ def modificarCajero():
             else:
                 print("Usuario Encontrado")
                 while True:
-                    nuevoCorreo = input("Ingresa nuevo correo: ").strip().lower()
+                    nuevoCorreo = input("Ingresa nuevo correo: ").strip()
                     if validarCorreo(nuevoCorreo) == True:
                         for usuario in usuarios:
                             for i in range(len(usuario[3])):
@@ -183,9 +290,7 @@ def modificarCajero():
             break
         elif pregunta == "2":
             while True:
-                documentoUsuario = input(
-                    "Ingrese documento del cajero: "
-                ).strip()
+                documentoUsuario = input("Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -206,7 +311,7 @@ def modificarCajero():
             else:
                 print("Usuario Encontrado")
                 while True:
-                    nuevaContraseña = input("Ingresa nueva contraseña: ").strip().lower()
+                    nuevaContraseña = input("Ingresa nueva contraseña: ").strip()
                     for usuario in usuarios:
                         for i in range(len(usuario[3])):
                             if documentoUsuario == usuario[3][1]:
@@ -224,9 +329,7 @@ def modificarCajero():
             break
         elif pregunta == "3":
             while True:
-                documentoUsuario = input(
-                    "Ingrese documento del cajero: "
-                ).strip()
+                documentoUsuario = input("Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -265,9 +368,7 @@ def modificarCajero():
             break
         elif pregunta == "4":
             while True:
-                documentoUsuario = input(
-                    "Ingrese documento del cajero: "
-                ).strip()
+                documentoUsuario = input("Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -288,7 +389,7 @@ def modificarCajero():
             else:
                 print("Usuario Encontrado")
                 while True:
-                    nuevoDocumento = input("Ingresa nuevo documento: ").strip().lower()
+                    nuevoDocumento = input("Ingresa nuevo documento: ").strip()
                     for usuario in usuarios:
                         for i in range(len(usuario[3])):
                             if documentoUsuario == usuario[3][1]:
@@ -308,11 +409,14 @@ def modificarCajero():
             print("Ingresa una opción valida")
 
 
-def iniciarSesion(usuario, contraseña):
+while True:
+    usuario = input("Ingrese usuario: ").strip()
+    contraseña = input("Ingrese contraseña: ").strip()
     encontrado = False
     for i in usuarios:
         if i[0] == usuario and i[1] == contraseña:
             encontrado = True
+            correoUsuario = usuario
             if i[2] == "admin":
                 while True:
                     preguntaAdmin = input(
@@ -341,8 +445,71 @@ def iniciarSesion(usuario, contraseña):
                             else:
                                 print("Ingresa un numero valido")
                     elif preguntaAdmin == "2":
-                        # codigo de productos
-                        break
+                        while True:
+                            preguntaCajero = input(
+                                "1. Ver Productos\n2. Modificar Productos\nSeleccione una opción: "
+                            ).strip()
+                            if preguntaCajero == "1":
+                                while True:
+                                    cont = 1
+                                    categoriasHabilitadas = []
+                                    opciones = ""
+                                    for i in tipos2:
+                                        if tipos2[i][1] == True:
+                                            categoriasHabilitadas.append(
+                                                [tipos2[i][0], True]
+                                            )
+                                            cont += 1
+                                        else:
+                                            categoriasHabilitadas.append(
+                                                [
+                                                    tipos2[i][0] + " (No habilitado)",
+                                                    False,
+                                                ]
+                                            )
+                                    for i, categoria in enumerate(
+                                        categoriasHabilitadas
+                                    ):
+                                        nombreCategoria = categoria[0]
+                                        opciones += (
+                                            f"{i+1}. {nombreCategoria.capitalize()}\n"
+                                        )
+                                    preguntaCategoria = input(
+                                        opciones + "Elige una opción: "
+                                    )
+                                    if preguntaCategoria.isdigit() and int(
+                                        preguntaCategoria
+                                    ) in range(1, cont + 1):
+                                        opcionSeleccionada = int(preguntaCategoria)
+                                        nombreCategoria = categoriasHabilitadas[
+                                            opcionSeleccionada - 1
+                                        ][0]
+                                        estaHabilitada = categoriasHabilitadas[
+                                            opcionSeleccionada - 1
+                                        ][1]
+
+                                        if not estaHabilitada:
+                                            print(
+                                                f"La categoría '{nombreCategoria}' está deshabilitada."
+                                            )
+                                        else:
+                                            #Codigo para mostrar los productos
+                                            break
+                                    else:
+                                        print(
+                                            "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
+                                        )
+                                    break
+                                # cont=1
+                                # for i in tipos2:
+                                #     print(cont,tipos2[i][0],tipos2[i][2])
+                                #     cont+=1
+
+                            elif preguntaCajero == "2":
+                                # Modificar producto
+                                break
+                            else:
+                                print("Ingresa un numero valido")
                     elif preguntaAdmin == "3":
                         # codigo de ventas
                         break
@@ -369,8 +536,3 @@ def iniciarSesion(usuario, contraseña):
                 break
             else:
                 print("Ingresa una opción valida")
-
-
-usuario = input("Ingrese usuario: ").strip().lower()
-contraseña = input("Ingrese contraseña: ").strip().lower()
-iniciarSesion(usuario, contraseña)
