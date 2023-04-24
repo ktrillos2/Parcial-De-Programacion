@@ -119,16 +119,18 @@ tamaños_brownie = {"1": [("Brownie con helado", 13200), True, ""]}
 
 # 12 SubCategorias Nuevas
 
+# subcategorias_nuevas = {1: [
+#     "galletas", False, "esto no se encuentra disponible ",{
+#     "1": [("Exotica", 10800), False, " No se encuentra disponible"],
+#     "2": [("Ron o amaretto", 10800), True, ""],
+# }], 2: ["sancocho", True, "",{"1": [("personal", 10800), True, ""],
+#     "2": [("para compartir sin helado", 10200), True, ""],
+#     "3": [("para compartir con helado", 14500), True, ""],}]}
 subcategorias_nuevas = {1: [
-    "galletas", False, "esto no se encuentra disponible ",{
-    "Exotica": 3,
-    "Ron o amaretto": 3,
-    "Caramelo": 3,
-    "Tropical": 3,
-    "Peach melba": 2,
-    "De la casa": 2,
-    "Sundae": 2,
-}], 2: ["sancocho", True, "",{"Brownie con helado", 13200}]}
+    "galletas", True, "esto no se encuentra disponible ",{
+    "1": [("Exotica", 10800), False, " No se encuentra disponible"],
+    "2": [("Ron o amaretto", 10800), True, ""],
+}], 2: ["sancocho", True, "",{}]}
 
 # ----------------------------------------------------------------Fin de productos----------------------------------------------------------------
 
@@ -591,25 +593,35 @@ while True:
                                                     contSubCategoria = 1
                                                     subcategoriasHabilitadas = []
                                                     opcionesSubcategorias = ""
-                                                    for i in tipos2:
+                                                    for i in subcategorias_nuevas:
                                                         subcategoriasHabilitadas.append(
-                                                            [tipos2[i][0] +
-                                                                tipos2[i][2]]
+                                                            [subcategorias_nuevas[i][0] + " " +
+                                                                subcategorias_nuevas[i][2]]
                                                         )
                                                         contSubCategoria += 1
                                                     for i, subCategoria in enumerate(
-                                                        categoriasHabilitadas
+                                                        subcategoriasHabilitadas
                                                     ):
                                                         nombreSubCategoria = subCategoria[0]
                                                         opcionesSubcategorias += (
                                                             f"{i+1}. {nombreSubCategoria.capitalize()}\n"
                                                         )
                                                     preguntaSubCategoria = input(
-                                                        opciones + "Elige una opción: "
+                                                        opcionesSubcategorias + "Elige una opción: "
                                                     )
-                                                    if preguntaSubCategoria.isdigit() and int(
-                                                        preguntaSubCategoria
-                                                    ):
+                                                    if preguntaSubCategoria.isdigit() and int(preguntaSubCategoria) > 0 and int(preguntaSubCategoria) <= len(subcategoriasHabilitadas):
+                                                        if len(subcategorias_nuevas[int(preguntaSubCategoria)][3])==0:
+                                                            print("Esta subcategoria no tiene productos")
+                                                        else:
+                                                            if subcategorias_nuevas[int(preguntaSubCategoria)][1]==True:
+                                                                for i in subcategorias_nuevas[int(preguntaSubCategoria)][3]:
+                                                                    print(subcategorias_nuevas[int(preguntaSubCategoria)][3][i][0]," ",subcategorias_nuevas[int(preguntaSubCategoria)][3][i][2])
+                                                            else:
+                                                                print("Esta subcategoria se encuentra deshabilitada")
+                                                    else:
+                                                        print(
+                                                            "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
+                                                        )            
                                                         
                                                 break
                                             break
