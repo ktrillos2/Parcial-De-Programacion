@@ -119,13 +119,6 @@ tamaños_brownie = {"1": [("Brownie con helado", 13200), True, ""]}
 
 # 12 SubCategorias Nuevas
 
-# subcategorias_nuevas = {1: [
-#     "galletas", False, "esto no se encuentra disponible ",{
-#     "1": [("Exotica", 10800), False, " No se encuentra disponible"],
-#     "2": [("Ron o amaretto", 10800), True, ""],
-# }], 2: ["sancocho", True, "",{"1": [("personal", 10800), True, ""],
-#     "2": [("para compartir sin helado", 10200), True, ""],
-#     "3": [("para compartir con helado", 14500), True, ""],}]}
 subcategorias_nuevas = {1: [
     "galletas", True, "esto no se encuentra disponible ",{
     "1": [("Exotica", 10800), False, " No se encuentra disponible"],
@@ -431,6 +424,30 @@ def modificarCajero():
         else:
             print("Ingresa una opción valida")
 
+def modificarProducto(productos):
+    nombre_producto = input("Ingresa el nombre del producto que deseas modificar: ")
+    encontrado = False
+    for clave in productos.keys():
+        if nombre_producto in productos[clave][0][0].lower():
+            encontrado = True
+            nombre_producto = clave
+            break
+    if encontrado:
+        print(f"Actualmente el producto '{productos[nombre_producto][0][0]}' tiene el siguiente precio:")
+        print(f"Precio: {productos[nombre_producto][0][1]}")
+        opcion = input("¿Qué deseas modificar? (1) Precio o (2) eliminar el producto: ")
+        if opcion == "1":
+            nuevo_precio = input("Ingresa el nuevo precio del producto: ")
+            productos[nombre_producto][1] = nuevo_precio
+            print(f"El precio del producto '{productos[nombre_producto][0][0]}' ha sido actualizado a {nuevo_precio}.")
+        elif opcion == "2":
+            nueva_descripcion = input("Ingresa la nueva descripción del producto: ")
+            productos[nombre_producto][2] = nueva_descripcion
+            print(f"La descripción del producto '{nombre_producto}' ha sido actualizada a '{nueva_descripcion}'.")
+        else:
+            print("Opción inválida. Por favor, ingresa 1 o 2.")
+    else:
+        print(f"No se encontró el producto '{nombre_producto}' en la lista de productos.")
 
 while True:
     usuario = input("Ingrese usuario: ").strip()
@@ -443,7 +460,7 @@ while True:
             if i[2] == "admin":
                 while True:
                     preguntaAdmin = input(
-                        "1. Cajeros\n2. Ver productos\n3. Ventas\nSelecciona una opción: "
+                        "1. Cajeros\n2. Productos\n3. Ventas\nSelecciona una opción: "
                     ).strip()
                     if preguntaAdmin == "1":
                         while True:
@@ -617,7 +634,7 @@ while True:
                                                                 for i in subcategorias_nuevas[int(preguntaSubCategoria)][3]:
                                                                     print(subcategorias_nuevas[int(preguntaSubCategoria)][3][i][0]," ",subcategorias_nuevas[int(preguntaSubCategoria)][3][i][2])
                                                             else:
-                                                                print("Esta subcategoria se encuentra deshabilitada")
+                                                                print("Esta subcategoría se encuentra deshabilitada")
                                                     else:
                                                         print(
                                                             "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
@@ -632,8 +649,164 @@ while True:
                                     break
 
                             elif preguntaCajero == "2":
-                                # Modificar producto
-                                break
+                                while True:
+                                    cont = 1
+                                    categoriasHabilitadas = []
+                                    opciones = ""
+                                    for i in tipos2:
+                                        if tipos2[i][1] == True:
+                                            categoriasHabilitadas.append(
+                                                [tipos2[i][0], True]
+                                            )
+                                            cont += 1
+                                        else:
+                                            categoriasHabilitadas.append(
+                                                [
+                                                    tipos2[i][0] +
+                                                    " (No habilitado)",
+                                                    False,
+                                                ]
+                                            )
+                                    for i, categoria in enumerate(
+                                        categoriasHabilitadas
+                                    ):
+                                        nombreCategoria = categoria[0]
+                                        opciones += (
+                                            f"{i+1}. {nombreCategoria.capitalize()}\n"
+                                        )
+                                    preguntaCategoria = input(
+                                        opciones + "Elige una opción: "
+                                    )
+                                    if preguntaCategoria.isdigit() and int(
+                                        preguntaCategoria
+                                    ) in range(1, cont + 1):
+                                        opcionSeleccionada = int(
+                                            preguntaCategoria)
+                                        nombreCategoria = categoriasHabilitadas[
+                                            opcionSeleccionada - 1
+                                        ][0]
+                                        estaHabilitada = categoriasHabilitadas[
+                                            opcionSeleccionada - 1
+                                        ][1]
+
+                                        if not estaHabilitada:
+                                            print(
+                                                f"La categoría '{nombreCategoria}' está deshabilitada."
+                                            )
+                                        else:
+                                            productos = {}
+                                            if preguntaCategoria == "1":
+                                                productos = tamaños_vasos
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                modificarProducto(productos)
+                                                break
+                                            elif preguntaCategoria == "2":
+                                                productos = tamaños_conos
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "3":
+                                                productos = tamaños_granizados
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "4":
+                                                productos = tamaños_copas_infantiles
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "5":
+                                                productos = tamaños_malteadas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "6":
+                                                productos = tamaños_litro_helado
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "7":
+                                                productos = tamaños_ensalada_frutas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "8":
+                                                productos = tamaños_fresas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "9":
+                                                productos = tamaños_copas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "10":
+                                                productos = tamaños_banana_split
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "11":
+                                                productos = tamaños_brownie
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "12":
+                                                if len(subcategorias_nuevas) == 0:
+                                                    print(
+                                                        "Esta categoría no tiene productos")
+                                                else:
+                                                    contSubCategoria = 1
+                                                    subcategoriasHabilitadas = []
+                                                    opcionesSubcategorias = ""
+                                                    for i in subcategorias_nuevas:
+                                                        subcategoriasHabilitadas.append(
+                                                            [subcategorias_nuevas[i][0] + " " +
+                                                                subcategorias_nuevas[i][2]]
+                                                        )
+                                                        contSubCategoria += 1
+                                                    for i, subCategoria in enumerate(
+                                                        subcategoriasHabilitadas
+                                                    ):
+                                                        nombreSubCategoria = subCategoria[0]
+                                                        opcionesSubcategorias += (
+                                                            f"{i+1}. {nombreSubCategoria.capitalize()}\n"
+                                                        )
+                                                    preguntaSubCategoria = input(
+                                                        opcionesSubcategorias + "Elige una opción: "
+                                                    )
+                                                    if preguntaSubCategoria.isdigit() and int(preguntaSubCategoria) > 0 and int(preguntaSubCategoria) <= len(subcategoriasHabilitadas):
+                                                        if len(subcategorias_nuevas[int(preguntaSubCategoria)][3])==0:
+                                                            print("Esta subcategoria no tiene productos")
+                                                        else:
+                                                            if subcategorias_nuevas[int(preguntaSubCategoria)][1]==True:
+                                                                for i in subcategorias_nuevas[int(preguntaSubCategoria)][3]:
+                                                                    print(subcategorias_nuevas[int(preguntaSubCategoria)][3][i][0]," ",subcategorias_nuevas[int(preguntaSubCategoria)][3][i][2])
+                                                            else:
+                                                                print("Esta subcategoría se encuentra deshabilitada")
+                                                    else:
+                                                        print(
+                                                            "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
+                                                        )            
+                                                        
+                                                break
+                                            break
+                                    else:
+                                        print(
+                                            "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
+                                        )
+                                    break
                             else:
                                 print("Ingresa un numero valido")
                     elif preguntaAdmin == "3":
