@@ -1,12 +1,37 @@
 # librería para verificar si un input es un correo
 import re
 
+# Fecha
+import datetime
+
+fecha_actual = datetime.date.today()
+
+fecha_formateada = fecha_actual.strftime('%d/%m/%Y')
+
 # [correo,contraseña,rol,[nombre,documento,activo o no activo]]
 usuarios = [
     ["admin@email.com", "admin123", "admin", []],
     ["cajero1@email.com", "cajero1", "cajero", ["prueba", "123456789", True]],
     ["cajero2@email.com", "cajero2", "cajero", ["prueba2", "1234567891", True]],
 ]
+
+#Afuera de todo el codigo
+ventas_generales = []
+contador_general=1
+
+#Se debe poner estos 3 datos en la parte antes del codigo de ingresar compra
+total=0
+factura_temporal= [] 
+Factura_unica = []
+
+# Extras
+
+sabores = {"1": "maracuya en agua","2":"tropical de agua","3":"chicle","4":"frutos rojos","5":"arequipe"
+           ,"6":"nata","7":"crocante","8":"maracuya en leche","9":"caramelo","10":"cereza","11":"fresa"
+           ,"12":"vainilla chips","13":"brownie","14":"galleta oreo","15":"leche klim"
+           ,"16":"chocolate","17":"MyM","18":"queso","19":"vainilla","20":"ron con pasas","21":"nucita","22":"stracciatella",}
+
+granizados = {"1": "frutos rojos","2":"naranja","3":"mango","4":"fresa","5":"cereza"}
 
 # ----------------------------------------------------------------Productos----------------------------------------------------------------
 tipos2 = {
@@ -31,7 +56,8 @@ tamaños_vasos = {
     "2": [["Doble", 8400], True, ""],
     "3": [["Triple", 10800], True, ""],
 }
-cantidad_bolas_vasos = {"Sencillo": 1, "Doble": 2, "Triple": 3}
+cantidad_bolas_vasos = {"Sencillo":1, "Doble": 2, "Triple":3}
+n_vasos=len(tamaños_vasos)+1
 
 # 2 = Conos
 tamaños_conos = {
@@ -41,14 +67,8 @@ tamaños_conos = {
     "4": [["Super cono", 10800], True, ""],
     "5": [["Mega cono", 14000], True, ""],
 }
-
-cantidad_bolas_conos = {
-    "Pequeño": 1,
-    "Mediano": 1,
-    "Doble": 2,
-    "Super cono": 3,
-    "Mega cono": 4,
-}
+n_conos=len(tamaños_conos)+1
+cantidad_bolas_conos = {"Pequeño":1, "Mediano": 1, "Doble":2, "Super cono": 3, "Mega cono":4}
 
 # 3 = Granizados
 tamaños_granizados = {
@@ -58,6 +78,7 @@ tamaños_granizados = {
     "4": [["Salpicon sin helado", 6300], True, ""],
     "5": [["copa chocolate", 9000], True, ""],
 }
+n_granizados=len(tamaños_granizados)+1
 
 # 4 = Copas infantiles
 tamaños_copas_infantiles = {
@@ -66,17 +87,19 @@ tamaños_copas_infantiles = {
     "3": [["Fiesta", 8800], True, ""],
     "4": [["chips", 8800], True, ""],
 }
-cantidad_bolas_copa_infantil = {
-    "Mickey": 1, "piñata": 1, "Fiesta": 2, "chips": 2}
+cantidad_bolas_copa_infantil = {"Mickey":1, "piñata": 1, "Fiesta":2, "chips": 2}
 
+n_infantil=len(tamaños_copas_infantiles)+1
 # 5 = Malteadas
 tamaños_malteadas = {
     "1": [["Malteada 12 onz", 10000], True, ""],
     "2": [["Malteada 16 onz", 12000], True, ""],
 }
+n_malteadas=len(tamaños_malteadas)+1
 
 # 6 = Litro de helado
 tamaños_litro_helado = {"1": [["Litro de helado", 27000], True, ""]}
+n_litro_helado=len(tamaños_litro_helado)+1
 
 # 7 = Ensalada de frutas
 tamaños_ensalada_frutas = {
@@ -84,12 +107,14 @@ tamaños_ensalada_frutas = {
     "2": [["para compartir sin helado", 10200], True, ""],
     "3": [["para compartir con helado", 14500], True, ""],
 }
+n_frutas=len(tamaños_ensalada_frutas)+1
 
 # 8 = Fresas
 tamaños_fresas = {
     "1": [["Fresas con crema", 11400], True, ""],
     "2": [["Fresas con helado", 8400], True, ""],
 }
+n_fresas=len(tamaños_fresas)+1
 
 # 9 = Copas
 tamaños_copas = {
@@ -101,23 +126,22 @@ tamaños_copas = {
     "6": [["De la casa", 10800], True, ""],
     "7": [["Sundae", 10800], False, "a"],
 }
-cantidad_bolas = {
-    "Exotica": 3,
-    "Ron o amaretto": 3,
-    "Caramelo": 3,
-    "Tropical": 3,
-    "Peach melba": 2,
-    "De la casa": 2,
-    "Sundae": 2,
-}
+n_copas=len(tamaños_copas)+1
+cantidad_bolas = {"Exotica":3, "Ron o amaretto": 3, "Caramelo":3, "Tropical": 3
+                  , "Peach melba":2, "De la casa": 2, "Sundae":2}
 
 # 10 = Banana split
 tamaños_banana_split = {"1": [["Banana split", 13200], True, ""]}
+n_banana=len(tamaños_banana_split)+1
 
 # 11 = Brownie con helado
 tamaños_brownie = {"1": [["Brownie con helado", 13200], True, ""]}
+n_brownie=len(tamaños_brownie)+1
 
-# 12 SubCategorias Nuevas
+#12 = Paletas
+n_paletas=13
+
+# 13 SubCategorias Nuevas
 
 subcategorias_nuevas = {1: [
     "galletas", True, "esto no se encuentra disponible ",{
@@ -127,11 +151,64 @@ subcategorias_nuevas = {1: [
 
 # ----------------------------------------------------------------Fin de productos----------------------------------------------------------------
 
+def validar_opcion(num_inicio, num_fin, pregunta):
+    while True:
+        opcion = input(pregunta)
+        if opcion.isdigit():
+            opcion = int(opcion)
+            if num_inicio <= opcion <= num_fin:
+                return str(opcion)
+        print("Por favor ingresa una opción válida entre", num_inicio, "y", num_fin)
+
+def Sabor_helados():
+    sabores = {"1": "maracuya en agua","2":"tropical de agua","3":"chicle","4":"frutos rojos","5":"arequipe"
+               ,"6":"nata","7":"crocante","8":"maracuya en leche","9":"caramelo","10":"cereza","11":"fresa"
+               ,"12":"vainilla chips","13":"brownie","14":"galleta oreo","15":"leche klim"
+               ,"16":"chocolate","17":"MyM","18":"queso","19":"vainilla","20":"ron con pasas","21":"nucita","22":"stracciatella",}
+    
+    cont=1
+    for i in sabores:
+        h=print(cont,sabores[i])
+        cont+=1
+    return h
+
+def Sabor_paletas():
+    sabores = {"1": "leche klim","2":"maracuya","3":"fresas con chocolate","4":"MyM","5":"Chantilli"
+               ,"6":"ron con pasas","7":"nucita","8":"frutos rojos","9":"chocomani","10":"oreo","11":"Chocolate"
+               ,"12":"Queso"}
+    
+    cont=1
+    for i in sabores:
+        h=print(cont,sabores[i])
+        cont+=1
+    return h
 
 def validarCorreo(correo):
     patron = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return bool(re.match(patron, correo))
 
+def agregarUsuario():
+    while True:
+        nuevo_usuario = input("Ingresa tu correo: ").strip()
+        if validarCorreo(nuevo_usuario)==True:
+            break
+    while True:
+        documento = input("Ingrese su documento: ").strip()
+        if documento.isdigit() and (len(documento) >= 8 or len(documento) <= 10):
+            break
+        else:
+            print("Documento inválido. Debe ser un número entero de 8 o 10 dígitos.")
+    nombre = input("Ingrese su nombre: ")
+    while True:
+        telefono = input("Ingrese su teléfono: ").strip()
+        if telefono.isdigit() and (len(telefono) == 10):
+            break
+        else:
+            print("Numero inválido. Debe ser un número entero de 10 dígitos.")
+    direccion = input("Ingrese su dirección: ")
+    contraseña = input("Ingrese una contraseña: ")
+    usuarios.append([nuevo_usuario,contraseña, "usuario", [nombre, documento, True, telefono, direccion]])
+    print("Usuario Creado exitosamente, ahora puedes iniciar sesión")
 
 def agregarCajero():
     while True:
@@ -213,7 +290,6 @@ def agregarCajero():
         else:
             print("Ingresa un correo valido")
 
-
 def eliminarCajero():
     while True:
         existe = False
@@ -249,7 +325,6 @@ def eliminarCajero():
                     return True
         else:
             print("Ingresa un documento valido")
-
 
 def modificarCajero():
     while True:
@@ -467,10 +542,6 @@ def modificarProducto(productos):
         else:
             print(f"La opción ingresada '{seleccion}' no es válida. Por favor, ingresa una opción válida.")
 
-
-
-
-
 def modificarProductosSubcategoria(productos):
     if len(productos) == 0:
         print("Esta subcategoría no tiene productos.")
@@ -512,11 +583,6 @@ def modificarProductosSubcategoria(productos):
                 break
             else:
                 print("Opción inválida. Ingresa un número correspondiente a una opción válida.")
-
-
-
-
-
 
 while True:
     usuario = input("Ingrese usuario: ").strip()
@@ -871,7 +937,7 @@ while True:
                 .lower()
             )
             if pregunta == "si":
-                # Aqui va codigo para agregar a una persona
+                agregarUsuario()
                 break
             else:
                 print("Ingresa una opción valida")
