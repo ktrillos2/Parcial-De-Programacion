@@ -21,6 +21,7 @@ tipos2 = {
     "9": ["Copas", True, ""],
     "10": ["Banana split", True, ""],
     "11": ["Brownie con helado", True, ""],
+    "12": ["Nuevas Categorias", True, ""],
 }
 
 
@@ -65,7 +66,8 @@ tamaños_copas_infantiles = {
     "3": [("Fiesta", 8800), True, ""],
     "4": [("chips", 8800), True, ""],
 }
-cantidad_bolas_copa_infantil = {"Mickey": 1, "piñata": 1, "Fiesta": 2, "chips": 2}
+cantidad_bolas_copa_infantil = {
+    "Mickey": 1, "piñata": 1, "Fiesta": 2, "chips": 2}
 
 # 5 = Malteadas
 tamaños_malteadas = {
@@ -114,6 +116,19 @@ tamaños_banana_split = {"1": [("Banana split", 13200), True, ""]}
 
 # 11 = Brownie con helado
 tamaños_brownie = {"1": [("Brownie con helado", 13200), True, ""]}
+
+# 12 SubCategorias Nuevas
+
+subcategorias_nuevas = {1: [
+    "galletas", False, "esto no se encuentra disponible ",{
+    "Exotica": 3,
+    "Ron o amaretto": 3,
+    "Caramelo": 3,
+    "Tropical": 3,
+    "Peach melba": 2,
+    "De la casa": 2,
+    "Sundae": 2,
+}], 2: ["sancocho", True, "",{"Brownie con helado", 13200}]}
 
 # ----------------------------------------------------------------Fin de productos----------------------------------------------------------------
 
@@ -248,7 +263,8 @@ def modificarCajero():
         ).strip()
         if pregunta == "1":
             while True:
-                documentoUsuario = input("Ingrese documento del cajero: ").strip()
+                documentoUsuario = input(
+                    "Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -290,7 +306,8 @@ def modificarCajero():
             break
         elif pregunta == "2":
             while True:
-                documentoUsuario = input("Ingrese documento del cajero: ").strip()
+                documentoUsuario = input(
+                    "Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -311,7 +328,8 @@ def modificarCajero():
             else:
                 print("Usuario Encontrado")
                 while True:
-                    nuevaContraseña = input("Ingresa nueva contraseña: ").strip()
+                    nuevaContraseña = input(
+                        "Ingresa nueva contraseña: ").strip()
                     for usuario in usuarios:
                         for i in range(len(usuario[3])):
                             if documentoUsuario == usuario[3][1]:
@@ -329,7 +347,8 @@ def modificarCajero():
             break
         elif pregunta == "3":
             while True:
-                documentoUsuario = input("Ingrese documento del cajero: ").strip()
+                documentoUsuario = input(
+                    "Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -350,7 +369,8 @@ def modificarCajero():
             else:
                 print("Usuario Encontrado")
                 while True:
-                    nuevoNombre = input("Ingresa nuevo nombre: ").strip().lower()
+                    nuevoNombre = input(
+                        "Ingresa nuevo nombre: ").strip().lower()
                     for usuario in usuarios:
                         for i in range(len(usuario[3])):
                             if documentoUsuario == usuario[3][1]:
@@ -368,7 +388,8 @@ def modificarCajero():
             break
         elif pregunta == "4":
             while True:
-                documentoUsuario = input("Ingrese documento del cajero: ").strip()
+                documentoUsuario = input(
+                    "Ingrese documento del cajero: ").strip()
                 if documentoUsuario.isdigit():
                     if len(documentoUsuario) < 8:
                         print("documento muy corto")
@@ -463,7 +484,8 @@ while True:
                                         else:
                                             categoriasHabilitadas.append(
                                                 [
-                                                    tipos2[i][0] + " (No habilitado)",
+                                                    tipos2[i][0] +
+                                                    " (No habilitado)",
                                                     False,
                                                 ]
                                             )
@@ -480,7 +502,8 @@ while True:
                                     if preguntaCategoria.isdigit() and int(
                                         preguntaCategoria
                                     ) in range(1, cont + 1):
-                                        opcionSeleccionada = int(preguntaCategoria)
+                                        opcionSeleccionada = int(
+                                            preguntaCategoria)
                                         nombreCategoria = categoriasHabilitadas[
                                             opcionSeleccionada - 1
                                         ][0]
@@ -493,17 +516,108 @@ while True:
                                                 f"La categoría '{nombreCategoria}' está deshabilitada."
                                             )
                                         else:
-                                            #Codigo para mostrar los productos
+                                            productos = {}
+                                            if preguntaCategoria == "1":
+                                                productos = tamaños_vasos
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "2":
+                                                productos = tamaños_conos
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "3":
+                                                productos = tamaños_granizados
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "4":
+                                                productos = tamaños_copas_infantiles
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "5":
+                                                productos = tamaños_malteadas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "6":
+                                                productos = tamaños_litro_helado
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "7":
+                                                productos = tamaños_ensalada_frutas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "8":
+                                                productos = tamaños_fresas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "9":
+                                                productos = tamaños_copas
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "10":
+                                                productos = tamaños_banana_split
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "11":
+                                                productos = tamaños_brownie
+                                                for i in productos:
+                                                    print(
+                                                        productos[i][0], productos[i][2])
+                                                break
+                                            elif preguntaCategoria == "12":
+                                                if len(subcategorias_nuevas) == 0:
+                                                    print(
+                                                        "Esta categoría no tiene productos")
+                                                else:
+                                                    contSubCategoria = 1
+                                                    subcategoriasHabilitadas = []
+                                                    opcionesSubcategorias = ""
+                                                    for i in tipos2:
+                                                        subcategoriasHabilitadas.append(
+                                                            [tipos2[i][0] +
+                                                                tipos2[i][2]]
+                                                        )
+                                                        contSubCategoria += 1
+                                                    for i, subCategoria in enumerate(
+                                                        categoriasHabilitadas
+                                                    ):
+                                                        nombreSubCategoria = subCategoria[0]
+                                                        opcionesSubcategorias += (
+                                                            f"{i+1}. {nombreSubCategoria.capitalize()}\n"
+                                                        )
+                                                    preguntaSubCategoria = input(
+                                                        opciones + "Elige una opción: "
+                                                    )
+                                                    if preguntaSubCategoria.isdigit() and int(
+                                                        preguntaSubCategoria
+                                                    ):
+                                                        
+                                                break
                                             break
                                     else:
                                         print(
                                             "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
                                         )
                                     break
-                                # cont=1
-                                # for i in tipos2:
-                                #     print(cont,tipos2[i][0],tipos2[i][2])
-                                #     cont+=1
 
                             elif preguntaCajero == "2":
                                 # Modificar producto
