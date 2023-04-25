@@ -1026,7 +1026,7 @@ while True:
     contraseña = input("Ingrese contraseña: ").strip()
     encontrado = False
     for i in usuarios:
-        if i[0] == usuario and i[1] == contraseña:
+        if i[0] == usuario and i[1] == contraseña and i[3][2]==True:
             encontrado = True
             correoUsuario = usuario
             if i[2] == "admin":
@@ -3328,14 +3328,15 @@ while True:
                     if modificar == "1":
                         r = 1
                         while r == 1:
-                            usuario = input("Ingrese su usuario: ").strip()
-                            contraseña = input(
+                            usuarioGlobal=usuario
+                            contraseñaGlobal=contraseña
+                            preguntaUsuario = input("Ingrese su usuario: ").strip()
+                            preguntaContraseña = input(
                                 "Ingrese su contraseña: ").strip()
                             encontrado = False
-                            for i in usuarios:
-                                if i[0].lower() == usuario.lower() and i[1].lower() == contraseña.lower():
-                                    encontrado = True
-                                    break
+                            print(usuarioGlobal,contraseñaGlobal)
+                            if usuarioGlobal == preguntaUsuario and contraseñaGlobal == preguntaContraseña:
+                                encontrado = True
                             if encontrado:
                                 t=1
                                 while t==1:
@@ -3378,10 +3379,11 @@ while True:
                                         g=1
                                         while g==1:
                                             nuevotel = input("Ingrese su nuevo teléfono: ")
-                                            if nuevotel.isdigit() and (len(nuevotel) == 10):
-                                                for usuario_info in usuarios:
-                                                    if usuario_info[0].lower() == usuario.lower():
-                                                        encontrado = True
+                                            if nuevotel.isdigit() and (len(nuevotel) == 10):                            
+                                                if nuevotel in [usuario_info[3][3] for usuario_info in usuarios]:
+                                                    print("El usuario ya esta registrado") 
+                                                else:   
+                                                    for usuario_info in usuarios:
                                                         if nuevotel != usuario_info[3][3]:
                                                             usuario_info[3][3] = nuevotel
                                                             print(usuarios)
@@ -3389,10 +3391,12 @@ while True:
                                                             r=2
                                                             g=2
                                                             break
+                                                        
                                                         else:
                                                             print("Ya tenía este numero.")
-                                            else:
-                                                print("Número inválido. Debe ser un número entero de 10 dígitos.")
+                                    
+                                        else:
+                                            print("Número inválido. Debe ser un número entero de 10 dígitos.")
                                     elif quecosa == "4":
                                         nuevadir = input(
                                             "Ingrese su nueva dirección: ").strip()
@@ -3412,7 +3416,6 @@ while True:
                             else:
                                 print("Usuario o contraseña incorrectos")
                     elif modificar == "2":
-                        print("Muchas gracias")
                         break
                     elif modificar == "3":
                         labrando = True
@@ -4798,23 +4801,59 @@ while True:
 
                             elif d == "14":
                                 labrando = False
-
-                        if total != 0:
-                            Factura_unica.append(contador_general)
-
-                            Factura_unica.append(correoUsuario)
-
-                            Factura_unica.append(fecha_formateada)
-
-                            Factura_unica.append(factura_temporal)
-
-                            Factura_unica.append(dicTotal)
-
-                            facturas.append(Factura_unica)
-
-                            contador_general += 1
-
-                            print(Factura_unica)
+                        while True:
+                            preguntaPago=input("1. Caja\n2. Online\n3. Caja - Pagar Online\n4. Online - Pago en caja\n5. Cancelar orden\nSelecciona una opción de pago: ")
+                            if preguntaPago=="1":
+                                if total != 0:
+                                    Factura_unica.append(contador_general)
+                                    Factura_unica.append(correoUsuario)
+                                    Factura_unica.append(fecha_formateada)
+                                    Factura_unica.append(factura_temporal)
+                                    Factura_unica.append(dicTotal)
+                                    Factura_unica.append("Caja")
+                                    facturas.append(Factura_unica)
+                                    contador_general += 1
+                                    print(Factura_unica)
+                                break
+                            if preguntaPago=="2":
+                                if total != 0:
+                                    Factura_unica.append(contador_general)
+                                    Factura_unica.append(correoUsuario)
+                                    Factura_unica.append(fecha_formateada)
+                                    Factura_unica.append(factura_temporal)
+                                    Factura_unica.append(dicTotal)
+                                    Factura_unica.append("Online")
+                                    facturas.append(Factura_unica)
+                                    contador_general += 1
+                                    print(Factura_unica)
+                                break
+                            if preguntaPago=="3":
+                                if total != 0:
+                                    Factura_unica.append(contador_general)
+                                    Factura_unica.append(correoUsuario)
+                                    Factura_unica.append(fecha_formateada)
+                                    Factura_unica.append(factura_temporal)
+                                    Factura_unica.append(dicTotal)
+                                    Factura_unica.append("Caja - Pago Online")
+                                    facturas.append(Factura_unica)
+                                    contador_general += 1
+                                    print(Factura_unica)
+                                break
+                            if preguntaPago=="4":
+                                if total != 0:
+                                    Factura_unica.append(contador_general)
+                                    Factura_unica.append(correoUsuario)
+                                    Factura_unica.append(fecha_formateada)
+                                    Factura_unica.append(factura_temporal)
+                                    Factura_unica.append(dicTotal)
+                                    Factura_unica.append("Online - Pago en caja")
+                                    facturas.append(Factura_unica)
+                                    contador_general += 1
+                                    print(Factura_unica)
+                                break
+                            if preguntaPago=="5":
+                                break
+                        
                     else:
                         print("Por favor ingrese 1 o 2.")
     if not encontrado:
