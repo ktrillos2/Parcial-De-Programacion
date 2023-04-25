@@ -29,7 +29,7 @@ usuarios = [
     ]
 ]
 
-# Afuera de todo el codigo
+# Afuera de todo el código
 facturas = [
     [
         1,
@@ -227,7 +227,7 @@ facturas = [
 ]
 contador_general = 16
 
-# Se debe poner estos 3 datos en la parte antes del codigo de ingresar compra
+# Se debe poner estos 3 datos en la parte antes del código de ingresar compra
 total = 0
 factura_temporal = []
 Factura_unica = []
@@ -1619,7 +1619,7 @@ while True:
                                                     tamaños_copas[str(n_copas)] = [
                                                         [preguntaNuevoProducto, precio], True, ""]
                                                     cantidadBolas = input(
-                                                        "¿Cuantas bolas de helado tendra ese tamaño?: ")
+                                                        "¿Cuantas bolas de helado tendrá ese tamaño?: ")
                                                     cantidad_bolas[preguntaNuevoProducto] = cantidadBolas
                                                     break
                                                 elif preguntaCategoria == "10":
@@ -1935,7 +1935,7 @@ while True:
                 labrando = True
                 while labrando == True:
                     print(
-                        "Bienvenid@ a la heladeria boquitas, que tipo de producto deseas elegir?"
+                        "Bienvenid@ a la heladería boquitas, que tipo de producto deseas elegir?"
                     )
                     cont = 1
                     for i in tipos2:
@@ -1949,7 +1949,7 @@ while True:
                             d1 = validar_opcion(
                                 1,
                                 2,
-                                "Deseas continuar en la sección de vasos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                "Deseas continuar en la sección de vasos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aquí:  ",
                             )
                             if d1 == "1":
                                 cent1 = True
@@ -1973,7 +1973,7 @@ while True:
                                             d2 = validar_opcion(
                                                 1,
                                                 2,
-                                                "Estas segur@ del tamaño del vaso o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:  ",
+                                                "Estas segur@ del tamaño del vaso o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aquí:  ",
                                             )
                                             if d2 == "1":
                                                 cent1 = True
@@ -1997,7 +1997,7 @@ while True:
                                                     d3 = validar_opcion(
                                                         1,
                                                         3,
-                                                        "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado \n3. Volver al menu \nIngrese aqui: ",
+                                                        "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado \n3. Volver al menu \nIngrese aquí: ",
                                                     )
                                                     if d3 == "1":
                                                         agregar = {
@@ -2019,7 +2019,7 @@ while True:
                                                         d2 = validar_opcion(
                                                             1,
                                                             2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aquí: ",
                                                         )
                                                         if d2 == "2":
                                                             labrando = False
@@ -2043,7 +2043,7 @@ while True:
                             d1 = validar_opcion(
                                 1,
                                 2,
-                                "Deseas continuar en la seccion de conos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                "Deseas continuar en la sección de conos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aquí:  ",
                             )
                             if d1 == "1":
                                 cent1 = True
@@ -2067,7 +2067,7 @@ while True:
                                             d2 = validar_opcion(
                                                 1,
                                                 2,
-                                                "Estas segur@ del tamaño del cono o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:  ",
+                                                "Estas segur@ del tamaño del cono o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aquí:  ",
                                             )
                                             if d2 == "1":
                                                 cent1 = True
@@ -2094,7 +2094,7 @@ while True:
                                                     d3 = validar_opcion(
                                                         1,
                                                         2,
-                                                        "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado  \nIngrese aqui: ",
+                                                        "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado  \nIngrese aquí: ",
                                                     )
                                                     if d3 == "1":
                                                         agregar = {
@@ -2116,7 +2116,7 @@ while True:
                                                         d2 = validar_opcion(
                                                             1,
                                                             2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aquí: ",
                                                         )
                                                         if d2 == "2":
                                                             labrando = False
