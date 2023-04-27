@@ -948,6 +948,44 @@ def modificarProducto(productos):
                 f"La opción ingresada '{seleccion}' no es válida. Por favor, ingresa una opción válida."
             )
 
+def realizarPedidoSubcategoria(productos):
+    productosSeleccionados = []
+
+    while True:
+        opcionesProductos = ""
+        for i, producto in enumerate(productos.items()):
+            nombreProducto = producto[1][0]
+            disponibleProducto = "disponible" if producto[1][1] else "no disponible"
+            opcionesProductos += f"{i+1}. {nombreProducto[0].capitalize()} - ({disponibleProducto}) - ${producto[1][0][1]}\n"
+        opcionesProductos += f"{len(productos)+1}. Finalizar pedido\n"
+
+        print(opcionesProductos)
+        preguntaProducto = input(
+            "¿Qué producto deseas agregar al pedido? Ingresa el número correspondiente: "
+        )
+
+        if (
+            preguntaProducto.isdigit()
+            and int(preguntaProducto) > 0
+            and int(preguntaProducto) <= len(productos)
+        ):
+            productoSeleccionado = list(productos.items())[int(preguntaProducto) - 1]
+            if productoSeleccionado[1][1]:
+                productosSeleccionados.append(productoSeleccionado)
+                print(
+                    f"Se ha agregado {productoSeleccionado[1][0][0].capitalize()} al pedido."
+                )
+            else:
+                print("Lo siento, el producto no está disponible.")
+        elif preguntaProducto == str(len(productos) + 1):
+            break
+        else:
+            print(
+                "Opción inválida. Ingresa un número correspondiente a una opción válida."
+            )
+
+    return productosSeleccionados
+
 
 def modificarProductosSubcategoria(productos):
     if len(productos) == 0:
@@ -3399,13 +3437,8 @@ while True:
                                                 "Esta subcategoria no tiene productos"
                                             )
                                         else:
-                                            modificarProductosSubcategoria(
-                                                subcategorias_nuevas[
-                                                    int(
-                                                        preguntaSubCategoria
-                                                    )
-                                                ][3]
-                                            )
+                                            productoSeleccionadoSubcategoria=realizarPedidoSubcategoria(subcategorias_nuevas[int(preguntaSubCategoria)][3])
+                                            print(productoSeleccionadoSubcategoria)
                                     else:
                                         print(
                                             "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
