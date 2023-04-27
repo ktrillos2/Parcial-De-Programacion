@@ -1,7 +1,13 @@
 # librería para verificar si un input es un correo
 import re
 
-# Fecha
+# Librería para hacer un cronometro al momento de crear la factura
+import time
+
+# Librería para convertir una función asíncrona y poder seguir ejecutando el código
+import threading
+
+# Librería Fecha
 import datetime
 
 fecha_actual = datetime.date.today()
@@ -9,39 +15,26 @@ fecha_actual = datetime.date.today()
 fecha_formateada = fecha_actual.strftime("%d/%m/%Y")
 
 # [correo,contraseña,rol,[nombre,documento,activo o no activo]]
-usuarios = [
-    ["admin@email.com", "admin123", "admin", []],
-    ["cajero1@email.com", "cajero1", "cajero",
-        ["prueba", "123456789", True, "", ""]],
-    ["cajero2@email.com", "cajero2", "cajero",
-        ["prueba2", "1234567891", True, "", ""]],
-    [
-        "angel@gmail.com",
-        "contra",
-        "usuario",
-        ["angel", "123456789", True, "3144098545", "Mz A lote 1"],
-    ],
-    [
-        "keiner@gmail.com",
-        "contra",
-        "usuario",
-        ["angel", "1234567893", True, "3222244572", "Mz A lote 1"],
-    ]
+usuarios = [    ["admin@email.com", "admin123", "admin", ["", "", True, "", ""]],
+    ["cajero1@email.com", "cajero1", "cajero", ["prueba", "123456789", True, "", ""]],
+    ["cajero2@email.com", "cajero2", "cajero", ["prueba2", "1234567891", True, "", ""]],
+    ["angel@gmail.com", "contra", "usuario", ["angel", "123456789", True, "3144098545", "Mz A lote 1"], 0],
+    ["keiner@gmail.com", "contra", "usuario", ["angel", "1234567893", True, "3222244572", "Mz A lote 1"], 0]
 ]
 
 # Afuera de todo el código
 facturas = [
     [
         1,
-        "Andres",
+        "keiner@gmail.com",
         "21/03/2023",
         {
             "tipo": "Ensalada de frutas",
             "tamaño": "para compartir sin helado",
             "sabor": ["Ensalada de frutas sin helado"],
             "precio": 10200,
-        },
-        2,
+        },"caja",
+        {"Total": 10200},
     ],
     [
         2,
@@ -52,8 +45,8 @@ facturas = [
             "tamaño": "Fresas con helado",
             "sabor": ["vainilla chips"],
             "precio": 8400,
-        },
-        3,
+        },"caja",
+        {"Total": 8400},
     ],
     [
         3,
@@ -64,8 +57,8 @@ facturas = [
             "tamaño": "Granizado 16 onz",
             "sabor": ["fresa"],
             "precio": 8400,
-        },
-        5,
+        },"online",
+        {"Total": 8400},
     ],
     [
         4,
@@ -76,8 +69,8 @@ facturas = [
             "tamaño": "Banana split",
             "sabor": ["fresa", "ron con pasas"],
             "precio": 13200,
-        },
-        6,
+        },"onlinecaja",
+        {"Total": 13200},
     ],
     [
         5,
@@ -88,8 +81,8 @@ facturas = [
             "tamaño": "Banana split",
             "sabor": ["fresa", "ron con pasas"],
             "precio": 13200,
-        },
-        7,
+        },"caja",
+        {"Total": 13200},
     ],
     [
         6,
@@ -100,27 +93,20 @@ facturas = [
             "tamaño": "para compartir con helado",
             "sabor": ["vainilla chips", "tropical de agua"],
             "precio": 14500,
-        },
-        7,
+        },"online",
+        {"Total": 14500},
     ],
     [
         7,
-        "Tomas",
-        "09/12/2020",
+        "Andres",
+        "12/08/2019",
         {
-            "1": "Vasos",
-            "2": "Conos",
-            "3": "Granizados",
-            "4": "Copas infantiles",
-            "5": " Malteadas",
-            "6": "Litro de helado",
-            "7": "Ensalada de frutas",
-            "8": "Fresas",
-            "9": "Copas",
-            "10": "Banana split",
-            "11": "Brownie con helado",
-        },
-        1,
+            "tipo": "Ensalada de frutas",
+            "tamaño": "para compartir con helado",
+            "sabor": ["vainilla chips", "tropical de agua"],
+            "precio": 14500,
+        },"caja",
+        {"Total": 14500},
     ],
     [
         8,
@@ -137,8 +123,8 @@ facturas = [
             "tamaño": "Litro de helado",
             "sabor": ["vainilla chips"],
             "precio": 27000,
-        },
-        7,
+        },"caja",
+        {"Total": 35400},
     ],
     [
         9,
@@ -149,8 +135,8 @@ facturas = [
             "tamaño": "Fiesta",
             "sabor": ["maracuya en leche", "nata"],
             "precio": 8800,
-        },
-        9,
+        },"online",
+        {"Total": 8800},
     ],
     [
         10,
@@ -161,8 +147,8 @@ facturas = [
             "tamaño": "Malteada 12 onz",
             "sabor": ["maracuya en leche"],
             "precio": 6400,
-        },
-        15,
+        },"onlinecaja",
+        {"Total": 6400},
     ],
     [
         11,
@@ -173,8 +159,8 @@ facturas = [
             "tamaño": "Banana split",
             "sabor": ["frutos rojos", "chicle"],
             "precio": 13200,
-        },
-        12,
+        },"caja",
+        {"Total": 13200},
     ],
     [
         12,
@@ -185,8 +171,8 @@ facturas = [
             "tamaño": "piñata",
             "sabor": ["crocante"],
             "precio": 10800,
-        },
-        1,
+        },"online",
+        {"Total": 10800},
     ],
     [
         13,
@@ -197,8 +183,8 @@ facturas = [
             "tamaño": "Granizado 16 onz",
             "sabor": ["fresa"],
             "precio": 8400,
-        },
-        6,
+        },"caja",
+        {"Total": 8400},
     ],
     [
         14,
@@ -209,8 +195,8 @@ facturas = [
             "tamaño": "para compartir con helado",
             "sabor": ["tropical de agua", "maracuya en agua"],
             "precio": 14500,
-        },
-        7,
+        },"online",
+        {"Total": 14500},
     ],
     [
         15,
@@ -221,14 +207,20 @@ facturas = [
             "tamaño": "Doble",
             "sabor": ["maracuya en agua", "tropical de agua"],
             "precio": 8400,
-        },
-        3,
+        },"onlinecaja",
+        {"Total": 8400},
     ],
 ]
-contador_general = 16
+facturasFinalizadas=[]
+facturasPendientes=[]
+facturasCreadas=[]
+
+# Para indicar el numero de la factura
+contador_general = len(facturas) + 1
 
 # Se debe poner estos 3 datos en la parte antes del código de ingresar compra
 total = 0
+# Solo tiene los productos factura temporal
 factura_temporal = []
 Factura_unica = []
 
@@ -286,7 +278,7 @@ tipos = {
 # ----------------------------------------------------------------Productos----------------------------------------------------------------
 tipos2 = {
     "1": ["Vasos", True, ""],
-    "2": ["Conos", False, ""],
+    "2": ["Conos", True, ""],
     "3": ["Granizados", True, ""],
     "4": ["Copas infantiles", True, ""],
     "5": ["Malteadas", True, ""],
@@ -303,7 +295,7 @@ cantidad_productos = len(tipos2) + 1
 
 # 1 = Vasos
 tamaños_vasos = {
-    "1": [["Sencillo", 5500], False, " -Este producto no se encuentra disponible"],
+    "1": [["Sencillo", 5500], True, ""],
     "2": [["Doble", 8400], True, ""],
     "3": [["Triple", 10800], True, ""],
 }
@@ -382,7 +374,7 @@ tamaños_copas = {
     "4": [["Tropical", 10800], True, ""],
     "5": [["Peach melba", 10800], True, ""],
     "6": [["De la casa", 10800], True, ""],
-    "7": [["Sundae", 10800], False, "a"],
+    "7": [["Sundae", 10800], True, ""],
 }
 n_copas = len(tamaños_copas) + 1
 cantidad_bolas = {
@@ -441,9 +433,9 @@ subcategorias_nuevas = {
     1: [
         "galletas",
         True,
-        "esto no se encuentra disponible ",
+        "",
         {
-            "1": [["Exotica", 10800], False, " No se encuentra disponible"],
+            "1": [["Exotica", 10800], True, ""],
             "2": [["Ron o amaretto", 10800], True, ""],
         },
     ],
@@ -453,6 +445,17 @@ n_subcategorias= len(subcategorias_nuevas)+1
 
 # ----------------------------------------------------------------Fin de productos----------------------------------------------------------------
 
+def agregarFactura(factura):
+    facturasCreadas.append(factura)
+    numFactura=factura[0]
+    time.sleep(5)
+    print("se empezo a producir el pedido")
+    for i,f in enumerate(facturasCreadas):
+        if f[0]==numFactura:
+            facturasPendientes.append(f)
+            del facturasCreadas[i]
+            break
+    
 
 def filtrar_por_mes_y_anio(facturas, mes, anio):
     facturas_filtradas = []
@@ -578,18 +581,9 @@ def agregarUsuario():
         while True:
             telefono = input("Ingrese su teléfono: ").strip()
             if telefono.isdigit() and (len(telefono) == 10):
-                telefono = int(telefono)
-                telefono_existe = False
-                for i in usuarios:
-                    for j in range(len(i[3])):
-                        if i[3][3] == telefono:
-                            telefono_existe = True
-                            break
-                if telefono_existe:
-                    print(
-                        "El número de teléfono ya está registrado. Por favor ingrese un número de teléfono diferente.")
-                    continue
-                else:
+                if telefono in [usuario_info[3][3] for usuario_info in usuarios]:
+                    print("El número ya esta registrado") 
+                else:   
                     break
             else:
                 print("Número inválido. Debe ser un número entero de 10 dígitos.")
@@ -597,7 +591,7 @@ def agregarUsuario():
         direccion = input("Ingrese su dirección: ").strip()
         contraseña = input("Ingrese una contraseña: ").strip()
         usuarios.append([nuevo_usuario, contraseña, "usuario", [
-                        nombre, documento, True, telefono, direccion]])
+                        nombre, documento, True, telefono, direccion],0])
         print("Usuario Creado exitosamente, ahora puedes iniciar sesión")
         break
 
@@ -1025,8 +1019,13 @@ while True:
     usuario = input("Ingrese usuario: ").strip()
     contraseña = input("Ingrese contraseña: ").strip()
     encontrado = False
+    habilitado=False
     for i in usuarios:
-        if i[0] == usuario and i[1] == contraseña and i[3][2]==True:
+        for j in range(len(i[3])):
+            if i[0] == usuario and i[1] == contraseña and i[3][2]:
+                habilitado = True
+    for i in usuarios:
+        if i[0] == usuario and i[1] == contraseña and habilitado==True:
             encontrado = True
             correoUsuario = usuario
             if i[2] == "admin":
@@ -1050,7 +1049,8 @@ while True:
                                     break
                             elif preguntaCajero == "4":
                                 for usuario in usuarios:
-                                    print(usuario)
+                                    if usuario[2]=="cajero":
+                                        print(usuario)
                                 break
                             elif preguntaCajero == "5":
                                 break
@@ -1777,7 +1777,8 @@ while True:
                                         print("Nombre: ", factura[1])
                                         print("Fecha: ", factura[2])
                                         print("Detalles: ", factura[3])
-                                        print(factura[4])
+                                        print("Tipo de pago: ", factura[4])
+                                        print("Total: ",factura[-1]["Total"])
                                         print("--------------")
 
                             elif imprimirFactura=="2":
@@ -1815,7 +1816,8 @@ while True:
                                                     print("Nombre: ", factura[1])
                                                     print("Fecha: ", factura[2])
                                                     print("Detalles: ", factura[3])
-                                                    print(factura[4])
+                                                    print("Tipo de pago: ", factura[4])
+                                                    print("Total: ",factura[-1]["Total"])
                                                     print("--------------")
                                                     r=2
                                             else:
@@ -1843,7 +1845,8 @@ while True:
                                             print("Nombre: ", factura[1])
                                             print("Fecha: ", factura[2])
                                             print("Detalles: ", factura[3])
-                                            print(factura[4])
+                                            print("Tipo de pago: ", factura[4])
+                                            print("Total: ",factura[-1]["Total"])
                                             print("--------------")
                                     if not facturas_coincidentes:
                                         print("No se encontraron facturas para la fecha ingresada.")
@@ -1878,7 +1881,8 @@ while True:
                                             print("Nombre: ", factura[1])
                                             print("Fecha: ", factura[2])
                                             print("Detalles: ", factura[3])
-                                            print(factura[4])
+                                            print("Tipo de pago: ", factura[4])
+                                            print("Total: ",factura[-1]["Total"])
                                             print("--------------")
                                 elif opcion == "2":
                                     while True:
@@ -1900,7 +1904,8 @@ while True:
                                             print("Nombre: ", factura[1])
                                             print("Fecha: ", factura[2])
                                             print("Detalles: ", factura[3])
-                                            print(factura[4])
+                                            print("Tipo de pago: ", factura[4])
+                                            print("Total: ",factura[-1]["Total"])
                                             print("--------------")
                                 elif opcion == "3":
                                     fecha_valida = False
@@ -1922,7 +1927,8 @@ while True:
                                             print("Nombre: ", factura[1])
                                             print("Fecha: ", factura[2])
                                             print("Detalles: ", factura[3])
-                                            print(factura[4])
+                                            print("Tipo de pago: ", factura[4])
+                                            print("Total: ",factura[-1]["Total"])
                                             print("--------------")
                                 elif opcion=="4":
                                     continue
@@ -1932,843 +1938,924 @@ while True:
                     elif preguntaAdmin == "4":
                         break
             elif i[2] == "cajero":
-                labrando = True
-                while labrando == True:
-                    print(
-                        "Bienvenid@ a la heladería boquitas, que tipo de producto deseas elegir?"
-                    )
-                    cont = 1
-                    for i in tipos2:
-                        print(cont, tipos2[i][0], tipos2[i][2])
-                        cont += 1
-                    print(cantidad_productos, "para salir")
-                    d = validar_opcion(1, cantidad_productos,
-                                       "Ingrese el tipo de producto a elegir: ")
-                    if d == "1":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la sección de vasos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aquí:  ",
-                            )
-                            if d1 == "1":
-                                cent1 = True
-                                while cent1 == True:
-                                    for i in tamaños_vasos:
-                                        valor1, valor2 = tamaños_vasos[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i, valor1, valor2, tamaños_vasos[i][2]
-                                            )
-                                        )
-                                    print(n_vasos, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1, n_vasos, "Que tamaño deseas elegir:  "
-                                    )
-                                    if tamaño_h == str(n_vasos):
-                                        cent1 = False
-                                    else:
-                                        tamaño, precio = tamaños_vasos[tamaño_h][0]
-                                        if tamaños_vasos[tamaño_h][1] == True:
-                                            d2 = validar_opcion(
-                                                1,
-                                                2,
-                                                "Estas segur@ del tamaño del vaso o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aquí:  ",
-                                            )
-                                            if d2 == "1":
-                                                cent1 = True
-                                                while cent1 == True:
-                                                    tamaño, precio = tamaños_vasos[
-                                                        tamaño_h
-                                                    ][0]
-                                                    bolas = cantidad_bolas_vasos[tamaño]
-                                                    sabor_elegido = []
-                                                    print("Sabores de helado")
-                                                    Sabor_helados()
-                                                    for z in range(0, bolas):
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea agregar: ",
-                                                        )
-                                                        sabor_elegido.append(
-                                                            sabores[sabor]
-                                                        )
-                                                    d3 = validar_opcion(
-                                                        1,
-                                                        3,
-                                                        "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado \n3. Volver al menu \nIngrese aquí: ",
-                                                    )
-                                                    if d3 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent1 = False
-                                                        cent3 = False
-                                                        d2 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aquí: ",
-                                                        )
-                                                        if d2 == "2":
-                                                            labrando = False
-                                                    elif d3 == "3":
-                                                        cent1 = False
-
-                                        else:
-                                            print(
-                                                "el siguiente tamaño no esta disponible en este momento:",
-                                                tamaño,
-                                            )
-
+                while True:
+                    preguntaCajero=input("1. Ver Pedidos Pendientes\n2. Realiza pedido\n3. Entregar Pedidos\n4. Salir\nSelecciona una opción: ")
+                    if preguntaCajero=="1":
+                        
+                        if len(facturasPendientes)==0:
+                            print("No hay pedidos pendientes")
                         else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
+                            for factura in facturasPendientes:
+                                print("---------------------")
+                                print("N°Factura: ", factura[0])
+                                print("Nombre: ", factura[1])
+                                print("Fecha: ", factura[2])
+                                print("Detalles: ", factura[3])
+                                print("Tipo de pago: ", factura[4])
+                                print("Total: ",factura[-1]["Total"])
+                                print("---------------------")
 
-                    elif d == "2":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la sección de conos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aquí:  ",
-                            )
-                            if d1 == "1":
-                                cent1 = True
-                                while cent1 == True:
-                                    for i in tamaños_conos:
-                                        valor1, valor2 = tamaños_conos[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i, valor1, valor2, tamaños_conos[i][2]
-                                            )
-                                        )
-                                    print(n_conos, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1, n_conos, "Que tamaño deseas elegir: "
-                                    )
-                                    if tamaño_h == str(n_conos):
-                                        cent1 = False
+                            while True:
+                                preguntaPedido = input("¿Qué factura deseas finalizar? (Ingresa el número de factura o selecciona 0 para volver): ")
+                                if preguntaPedido.isdigit():
+                                    preguntaPedido = int(preguntaPedido)
+                                    if preguntaPedido == 0:
+                                        break
                                     else:
-                                        tamaño_v, precio = tamaños_conos[tamaño_h][0]
-                                        if tamaños_conos[tamaño_h][1] == True:
-                                            d2 = validar_opcion(
-                                                1,
-                                                2,
-                                                "Estas segur@ del tamaño del cono o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aquí:  ",
+                                        encontradoPendiente=False
+                                        for facturaP in facturasPendientes:
+                                            if facturaP[0]==preguntaPedido:
+                                                encontradoPendiente=True
+                                        if encontradoPendiente==True:
+                                            for i,facturaP in enumerate(facturasPendientes):
+                                                if facturaP[0]==preguntaPedido:
+                                                    facturasFinalizadas.append(facturasPendientes[i])
+                                                    del facturasPendientes[i]
+                                                    print("Pedido Completado")
+                                            break
+                                        else:
+                                            print("No se encontró el pedido")
+                                else:
+                                    print("Ingresa una opción válida")
+                    if preguntaCajero=="2":
+                        labrando = True
+                        while labrando == True:
+                            print(
+                                "Bienvenid@ a la heladería boquitas, que tipo de producto deseas elegir?"
+                            )
+                            cont = 1
+                            for i in tipos2:
+                                print(cont, tipos2[i][0], tipos2[i][2])
+                                cont += 1
+                            print(cantidad_productos, "para salir")
+                            d = validar_opcion(1, cantidad_productos,
+                                            "Ingrese el tipo de producto a elegir: ")
+                            if d == "1":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la sección de vasos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aquí:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent1 = True
+                                        while cent1 == True:
+                                            for i in tamaños_vasos:
+                                                valor1, valor2 = tamaños_vasos[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i, valor1, valor2, tamaños_vasos[i][2]
+                                                    )
+                                                )
+                                            print(n_vasos, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1, n_vasos, "Que tamaño deseas elegir:  "
                                             )
-                                            if d2 == "1":
-                                                cent1 = True
-                                                while cent1 == True:
-                                                    tamaño_v, precio = tamaños_conos[
-                                                        tamaño_h
-                                                    ][0]
-                                                    bolas = cantidad_bolas_conos[
-                                                        tamaño_v
-                                                    ]
-                                                    sabor_elegido = []
-                                                    print("Sabores de helado")
-                                                    Sabor_helados()
-                                                    for z in range(0, bolas):
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea agregar: ",
-                                                        )
-
-                                                        sabor_elegido.append(
-                                                            sabores[sabor]
-                                                        )
-                                                    d3 = validar_opcion(
+                                            if tamaño_h == str(n_vasos):
+                                                cent1 = False
+                                            else:
+                                                tamaño, precio = tamaños_vasos[tamaño_h][0]
+                                                if tamaños_vasos[tamaño_h][1] == True:
+                                                    d2 = validar_opcion(
                                                         1,
                                                         2,
-                                                        "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado  \nIngrese aquí: ",
+                                                        "Estas segur@ del tamaño del vaso o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aquí:  ",
                                                     )
-                                                    if d3 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño_v,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent1 = False
-                                                        cent3 = False
+                                                    if d2 == "1":
+                                                        cent1 = True
+                                                        while cent1 == True:
+                                                            tamaño, precio = tamaños_vasos[
+                                                                tamaño_h
+                                                            ][0]
+                                                            bolas = cantidad_bolas_vasos[tamaño]
+                                                            sabor_elegido = []
+                                                            print("Sabores de helado")
+                                                            Sabor_helados()
+                                                            for z in range(0, bolas):
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea agregar: ",
+                                                                )
+                                                                sabor_elegido.append(
+                                                                    sabores[sabor]
+                                                                )
+                                                            d3 = validar_opcion(
+                                                                1,
+                                                                3,
+                                                                "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado \n3. Volver al menu \nIngrese aquí: ",
+                                                            )
+                                                            if d3 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent1 = False
+                                                                cent3 = False
+                                                                d2 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aquí: ",
+                                                                )
+                                                                if d2 == "2":
+                                                                    labrando = False
+                                                            elif d3 == "3":
+                                                                cent1 = False
+
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño no esta disponible en este momento:",
+                                                        tamaño,
+                                                    )
+
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+
+                            elif d == "2":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la sección de conos o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aquí:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent1 = True
+                                        while cent1 == True:
+                                            for i in tamaños_conos:
+                                                valor1, valor2 = tamaños_conos[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i, valor1, valor2, tamaños_conos[i][2]
+                                                    )
+                                                )
+                                            print(n_conos, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1, n_conos, "Que tamaño deseas elegir: "
+                                            )
+                                            if tamaño_h == str(n_conos):
+                                                cent1 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_conos[tamaño_h][0]
+                                                if tamaños_conos[tamaño_h][1] == True:
+                                                    d2 = validar_opcion(
+                                                        1,
+                                                        2,
+                                                        "Estas segur@ del tamaño del cono o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aquí:  ",
+                                                    )
+                                                    if d2 == "1":
+                                                        cent1 = True
+                                                        while cent1 == True:
+                                                            tamaño_v, precio = tamaños_conos[
+                                                                tamaño_h
+                                                            ][0]
+                                                            bolas = cantidad_bolas_conos[
+                                                                tamaño_v
+                                                            ]
+                                                            sabor_elegido = []
+                                                            print("Sabores de helado")
+                                                            Sabor_helados()
+                                                            for z in range(0, bolas):
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea agregar: ",
+                                                                )
+
+                                                                sabor_elegido.append(
+                                                                    sabores[sabor]
+                                                                )
+                                                            d3 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "estas segur@ del sabor de helado? \n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado  \nIngrese aquí: ",
+                                                            )
+                                                            if d3 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño_v,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent1 = False
+                                                                cent3 = False
+                                                                d2 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aquí: ",
+                                                                )
+                                                                if d2 == "2":
+                                                                    labrando = False
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño no esta disponible en este momento:",
+                                                        tamaño_v,
+                                                    )
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+                            elif d == "3":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de Granizados o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent1 = True
+                                        while cent1 == True:
+                                            for i in tamaños_granizados:
+                                                valor1, valor2 = tamaños_granizados[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i,
+                                                        valor1,
+                                                        valor2,
+                                                        tamaños_granizados[i][2],
+                                                    )
+                                                )
+                                            print(n_granizados, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1, n_granizados, "Que granizado deseas elegir:"
+                                            )
+                                            if tamaño_h == str(n_granizados):
+                                                cent1 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_granizados[tamaño_h][
+                                                    0
+                                                ]
+                                                if tamaños_granizados[tamaño_h][1] == True:
+                                                    if tamaño_h == "1" or tamaño_h == "2":
                                                         d2 = validar_opcion(
                                                             1,
                                                             2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aquí: ",
+                                                            "Estas segur@ de tu granizado o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:  ",
                                                         )
-                                                        if d2 == "2":
-                                                            labrando = False
-                                        else:
-                                            print(
-                                                "el siguiente tamaño no esta disponible en este momento:",
-                                                tamaño_v,
-                                            )
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-                    elif d == "3":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de Granizados o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent1 = True
-                                while cent1 == True:
-                                    for i in tamaños_granizados:
-                                        valor1, valor2 = tamaños_granizados[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i,
-                                                valor1,
-                                                valor2,
-                                                tamaños_granizados[i][2],
-                                            )
-                                        )
-                                    print(n_granizados, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1, n_granizados, "Que granizado deseas elegir:"
-                                    )
-                                    if tamaño_h == str(n_granizados):
-                                        cent1 = False
-                                    else:
-                                        tamaño_v, precio = tamaños_granizados[tamaño_h][
-                                            0
-                                        ]
-                                        if tamaños_granizados[tamaño_h][1] == True:
-                                            if tamaño_h == "1" or tamaño_h == "2":
-                                                d2 = validar_opcion(
-                                                    1,
-                                                    2,
-                                                    "Estas segur@ de tu granizado o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:  ",
-                                                )
-                                                if d2 == "1":
-                                                    (
-                                                        tamaño_v,
-                                                        precio,
-                                                    ) = tamaños_granizados[tamaño_h][0]
-                                                    sabor_elegido = []
-                                                    cent3 = True
-                                                    while cent3 == True:
-                                                        cont = 1
-                                                        for i in granizados:
-                                                            print(
-                                                                cont, granizados[i])
-                                                            cont += 1
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            5,
-                                                            "Que sabor de granizado desea agregar: ",
-                                                        )
-                                                        d1 = validar_opcion(
+                                                        if d2 == "1":
+                                                            (
+                                                                tamaño_v,
+                                                                precio,
+                                                            ) = tamaños_granizados[tamaño_h][0]
+                                                            sabor_elegido = []
+                                                            cent3 = True
+                                                            while cent3 == True:
+                                                                cont = 1
+                                                                for i in granizados:
+                                                                    print(
+                                                                        cont, granizados[i])
+                                                                    cont += 1
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    5,
+                                                                    "Que sabor de granizado desea agregar: ",
+                                                                )
+                                                                d1 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "Estas seguro del sabor de tu granizado o quieres cambiar \n1. Estoy segur@  \n2. Quiero cambiar \nIngrese aqui:  ",
+                                                                )
+                                                                if d1 == "1":
+                                                                    sabor_elegido.append(
+                                                                        granizados[sabor]
+                                                                    )
+
+                                                                    agregar = {
+                                                                        "tipo": tipos[d],
+                                                                        "tamaño": tamaño_v,
+                                                                        "sabor": sabor_elegido,
+                                                                        "precio": precio,
+                                                                    }
+                                                                    total = (
+                                                                        total
+                                                                        + agregar["precio"]
+                                                                    )
+                                                                    dicTotal = {}
+                                                                    dicTotal["Total"] = total
+                                                                    factura_temporal.append(
+                                                                        agregar
+                                                                    )
+                                                                    cent1 = False
+                                                                    cent3 = False
+                                                                    d2 = validar_opcion(
+                                                                        1,
+                                                                        2,
+                                                                        "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                    )
+                                                                    if d2 == "2":
+                                                                        labrando = False
+
+                                                    elif tamaño_h == "3":
+                                                        d2 = validar_opcion(
                                                             1,
                                                             2,
-                                                            "Estas seguro del sabor de tu granizado o quieres cambiar \n1. Estoy segur@  \n2. Quiero cambiar \nIngrese aqui:  ",
+                                                            "estas segur@ del tipo de Granizado \n1. Estoy segur@ \n2. Quiero cambiar mi granizado \nIngrese aqui: ",
                                                         )
-                                                        if d1 == "1":
-                                                            sabor_elegido.append(
-                                                                granizados[sabor]
-                                                            )
+                                                        if d2 == "1":
+                                                            cent3 = True
+                                                            while cent3 == True:
+                                                                (
+                                                                    tamaño_v,
+                                                                    precio,
+                                                                ) = tamaños_granizados[
+                                                                    tamaño_h
+                                                                ][
+                                                                    0
+                                                                ]
+                                                                sabor_elegido = []
+                                                                print(
+                                                                    "Sabores de helado")
+                                                                Sabor_helados()
 
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea en el salpicon: ",
+                                                                )
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "estas segur@ del helado del salpicon? \n1. Estoy segur@ \n2. Quiero cambiar mi helado del salpicon  \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "1":
+                                                                    sabor_elegido.append(
+                                                                        sabores[sabor]
+                                                                    )
+                                                                    agregar = {
+                                                                        "tipo": tipos[d],
+                                                                        "tamaño": tamaño_v,
+                                                                        "sabor": sabor_elegido,
+                                                                        "precio": precio,
+                                                                    }
+                                                                    total = (
+                                                                        total
+                                                                        + agregar["precio"]
+                                                                    )
+                                                                    dicTotal = {}
+                                                                    dicTotal["Total"] = total
+                                                                    factura_temporal.append(
+                                                                        agregar
+                                                                    )
+                                                                    cent1 = False
+                                                                    cent3 = False
+                                                                    d3 = validar_opcion(
+                                                                        1,
+                                                                        2,
+                                                                        "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                    )
+                                                                    if d3 == "2":
+                                                                        labrando = False
+
+                                                    elif tamaño_h == "4":
+                                                        d2 = validar_opcion(
+                                                            1,
+                                                            2,
+                                                            "estas segur@ del tipo de Granizado \n1. Estoy segur@ \n2. Quiero cambiar mi granizado \nIngrese aqui: ",
+                                                        )
+                                                        if d2 == "1":
+                                                            (
+                                                                tamaño_v,
+                                                                precio,
+                                                            ) = tamaños_granizados[tamaño_h][0]
+                                                            salpicon_sin_helado = [
+                                                                "salpicon sin helado"
+                                                            ]
                                                             agregar = {
                                                                 "tipo": tipos[d],
                                                                 "tamaño": tamaño_v,
-                                                                "sabor": sabor_elegido,
+                                                                "sabor": salpicon_sin_helado,
                                                                 "precio": precio,
                                                             }
-                                                            total = (
-                                                                total
-                                                                + agregar["precio"]
-                                                            )
+                                                            total = total + \
+                                                                agregar["precio"]
                                                             dicTotal = {}
                                                             dicTotal["Total"] = total
                                                             factura_temporal.append(
-                                                                agregar
-                                                            )
+                                                                agregar)
                                                             cent1 = False
-                                                            cent3 = False
+
+                                                            d3 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                            )
+                                                            if d3 == "2":
+                                                                labrando = False
+
+                                                    elif tamaño_h == "5":
+                                                        d2 = validar_opcion(
+                                                            1,
+                                                            2,
+                                                            "estas segur@ del tipo de malteada \n1. Estoy segur@ \n2. Quiero cambiar mi granizado \nIngrese aqui: ",
+                                                        )
+                                                        if d2 == "1":
+                                                            cent3 = True
+                                                            while cent3 == True:
+                                                                (
+                                                                    tamaño_v,
+                                                                    precio,
+                                                                ) = tamaños_granizados[
+                                                                    tamaño_h
+                                                                ][
+                                                                    0
+                                                                ]
+                                                                sabor_elegido = []
+                                                                print(
+                                                                    "Sabores de helado")
+                                                                Sabor_helados()
+
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea de acompañamiento: ",
+                                                                )
+                                                                sabor_elegido.append(
+                                                                    sabores[sabor]
+                                                                )
+                                                                d2 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
+                                                                )
+                                                                if d2 == "1":
+                                                                    agregar = {
+                                                                        "tipo": tipos[d],
+                                                                        "tamaño": tamaño_v,
+                                                                        "sabor": sabor_elegido,
+                                                                        "precio": precio,
+                                                                    }
+                                                                    total = (
+                                                                        total
+                                                                        + agregar["precio"]
+                                                                    )
+                                                                    dicTotal = {}
+                                                                    dicTotal["Total"] = total
+                                                                    factura_temporal.append(
+                                                                        agregar
+                                                                    )
+                                                                    cent1 = False
+                                                                    cent3 = False
+                                                                    d3 = validar_opcion(
+                                                                        1,
+                                                                        2,
+                                                                        "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                    )
+                                                                    if d3 == "2":
+                                                                        labrando = False
+                                                else:
+                                                    print(
+                                                        "El siguiente producto no esta disponible:",
+                                                        tamaño_v,
+                                                    )
+
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+                            elif d == "4":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de copas infantiles o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent1 = True
+                                        while cent1 == True:
+                                            for i in tamaños_copas_infantiles:
+                                                valor1, valor2 = tamaños_copas_infantiles[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i,
+                                                        valor1,
+                                                        valor2,
+                                                        tamaños_copas_infantiles[i][2],
+                                                    )
+                                                )
+                                            print(n_infantil, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1, n_infantil, "Que tamaño deseas elegir: "
+                                            )
+                                            if tamaño_h == str(n_infantil):
+                                                cent1 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_copas_infantiles[
+                                                    tamaño_h
+                                                ][0]
+                                                if (
+                                                    tamaños_copas_infantiles[tamaño_h][1]
+                                                    == True
+                                                ):
+                                                    d2 = validar_opcion(
+                                                        1,
+                                                        2,
+                                                        "estas segur@ del tipo de copa infantil? \n1. Estoy segur@ \n2. Quiero cambiar mi copa infantil \nIngrese aqui: ",
+                                                    )
+                                                    if d2 == "1":
+                                                        cent2 = True
+                                                        while cent2 == True:
+                                                            (
+                                                                tamaño_v,
+                                                                precio,
+                                                            ) = tamaños_copas_infantiles[
+                                                                tamaño_h
+                                                            ][
+                                                                0
+                                                            ]
+                                                            bolas = (
+                                                                cantidad_bolas_copa_infantil[
+                                                                    tamaño_v
+                                                                ]
+                                                            )
+                                                            sabor_elegido = []
+                                                            print("Sabores de helado")
+                                                            Sabor_helados()
+                                                            for z in range(0, bolas):
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea agregar: ",
+                                                                )
+                                                                sabor_elegido.append(
+                                                                    sabores[sabor]
+                                                                )
                                                             d2 = validar_opcion(
                                                                 1,
                                                                 2,
-                                                                "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
                                                             )
-                                                            if d2 == "2":
-                                                                labrando = False
-
-                                            elif tamaño_h == "3":
-                                                d2 = validar_opcion(
-                                                    1,
-                                                    2,
-                                                    "estas segur@ del tipo de Granizado \n1. Estoy segur@ \n2. Quiero cambiar mi granizado \nIngrese aqui: ",
-                                                )
-                                                if d2 == "1":
-                                                    cent3 = True
-                                                    while cent3 == True:
-                                                        (
-                                                            tamaño_v,
-                                                            precio,
-                                                        ) = tamaños_granizados[
-                                                            tamaño_h
-                                                        ][
-                                                            0
-                                                        ]
-                                                        sabor_elegido = []
-                                                        print(
-                                                            "Sabores de helado")
-                                                        Sabor_helados()
-
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea en el salpicon: ",
-                                                        )
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "estas segur@ del helado del salpicon? \n1. Estoy segur@ \n2. Quiero cambiar mi helado del salpicon  \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "1":
-                                                            sabor_elegido.append(
-                                                                sabores[sabor]
-                                                            )
-                                                            agregar = {
-                                                                "tipo": tipos[d],
-                                                                "tamaño": tamaño_v,
-                                                                "sabor": sabor_elegido,
-                                                                "precio": precio,
-                                                            }
-                                                            total = (
-                                                                total
-                                                                + agregar["precio"]
-                                                            )
-                                                            dicTotal = {}
-                                                            dicTotal["Total"] = total
-                                                            factura_temporal.append(
-                                                                agregar
-                                                            )
-                                                            cent1 = False
-                                                            cent3 = False
-                                                            d3 = validar_opcion(
-                                                                1,
-                                                                2,
-                                                                "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                            )
-                                                            if d3 == "2":
-                                                                labrando = False
-
-                                            elif tamaño_h == "4":
-                                                d2 = validar_opcion(
-                                                    1,
-                                                    2,
-                                                    "estas segur@ del tipo de Granizado \n1. Estoy segur@ \n2. Quiero cambiar mi granizado \nIngrese aqui: ",
-                                                )
-                                                if d2 == "1":
-                                                    (
+                                                            if d2 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño_v,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent1 = False
+                                                                cent2 = False
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "2":
+                                                                    labrando = False
+                                                else:
+                                                    print(
+                                                        "El siguiente tipo no se encuentra disponible:",
                                                         tamaño_v,
-                                                        precio,
-                                                    ) = tamaños_granizados[tamaño_h][0]
-                                                    salpicon_sin_helado = [
-                                                        "salpicon sin helado"
-                                                    ]
-                                                    agregar = {
-                                                        "tipo": tipos[d],
-                                                        "tamaño": tamaño_v,
-                                                        "sabor": salpicon_sin_helado,
-                                                        "precio": precio,
-                                                    }
-                                                    total = total + \
-                                                        agregar["precio"]
-                                                    dicTotal = {}
-                                                    dicTotal["Total"] = total
-                                                    factura_temporal.append(
-                                                        agregar)
-                                                    cent1 = False
-
-                                                    d3 = validar_opcion(
-                                                        1,
-                                                        2,
-                                                        "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
                                                     )
-                                                    if d3 == "2":
-                                                        labrando = False
-
-                                            elif tamaño_h == "5":
-                                                d2 = validar_opcion(
-                                                    1,
-                                                    2,
-                                                    "estas segur@ del tipo de malteada \n1. Estoy segur@ \n2. Quiero cambiar mi granizado \nIngrese aqui: ",
-                                                )
-                                                if d2 == "1":
-                                                    cent3 = True
-                                                    while cent3 == True:
-                                                        (
-                                                            tamaño_v,
-                                                            precio,
-                                                        ) = tamaños_granizados[
-                                                            tamaño_h
-                                                        ][
-                                                            0
-                                                        ]
-                                                        sabor_elegido = []
-                                                        print(
-                                                            "Sabores de helado")
-                                                        Sabor_helados()
-
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea de acompañamiento: ",
-                                                        )
-                                                        sabor_elegido.append(
-                                                            sabores[sabor]
-                                                        )
-                                                        d2 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
-                                                        )
-                                                        if d2 == "1":
-                                                            agregar = {
-                                                                "tipo": tipos[d],
-                                                                "tamaño": tamaño_v,
-                                                                "sabor": sabor_elegido,
-                                                                "precio": precio,
-                                                            }
-                                                            total = (
-                                                                total
-                                                                + agregar["precio"]
-                                                            )
-                                                            dicTotal = {}
-                                                            dicTotal["Total"] = total
-                                                            factura_temporal.append(
-                                                                agregar
-                                                            )
-                                                            cent1 = False
-                                                            cent3 = False
-                                                            d3 = validar_opcion(
-                                                                1,
-                                                                2,
-                                                                "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                            )
-                                                            if d3 == "2":
-                                                                labrando = False
-                                        else:
-                                            print(
-                                                "El siguiente producto no esta disponible:",
-                                                tamaño_v,
-                                            )
-
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-                    elif d == "4":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de copas infantiles o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent1 = True
-                                while cent1 == True:
-                                    for i in tamaños_copas_infantiles:
-                                        valor1, valor2 = tamaños_copas_infantiles[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i,
-                                                valor1,
-                                                valor2,
-                                                tamaños_copas_infantiles[i][2],
-                                            )
-                                        )
-                                    print(n_infantil, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1, n_infantil, "Que tamaño deseas elegir: "
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
                                     )
-                                    if tamaño_h == str(n_infantil):
-                                        cent1 = False
-                                    else:
-                                        tamaño_v, precio = tamaños_copas_infantiles[
-                                            tamaño_h
-                                        ][0]
-                                        if (
-                                            tamaños_copas_infantiles[tamaño_h][1]
-                                            == True
-                                        ):
-                                            d2 = validar_opcion(
-                                                1,
-                                                2,
-                                                "estas segur@ del tipo de copa infantil? \n1. Estoy segur@ \n2. Quiero cambiar mi copa infantil \nIngrese aqui: ",
-                                            )
-                                            if d2 == "1":
-                                                cent2 = True
-                                                while cent2 == True:
-                                                    (
-                                                        tamaño_v,
-                                                        precio,
-                                                    ) = tamaños_copas_infantiles[
-                                                        tamaño_h
-                                                    ][
-                                                        0
-                                                    ]
-                                                    bolas = (
-                                                        cantidad_bolas_copa_infantil[
-                                                            tamaño_v
-                                                        ]
+                            elif d == "5":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de malteadas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent1 = True
+                                        while cent1 == True:
+                                            for i in tamaños_malteadas:
+                                                valor1, valor2 = tamaños_malteadas[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3} ".format(
+                                                        i,
+                                                        valor1,
+                                                        valor2,
+                                                        tamaños_malteadas[i][2],
                                                     )
-                                                    sabor_elegido = []
-                                                    print("Sabores de helado")
-                                                    Sabor_helados()
-                                                    for z in range(0, bolas):
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea agregar: ",
-                                                        )
-                                                        sabor_elegido.append(
-                                                            sabores[sabor]
-                                                        )
+                                                )
+                                            print(n_malteadas, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1,
+                                                n_malteadas,
+                                                "que tamaño de malteada desea?: ",
+                                            )
+                                            if tamaño_h == str(n_malteadas):
+                                                cent1 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_malteadas[tamaño_h][
+                                                    0
+                                                ]
+                                                if tamaños_malteadas[tamaño_h][1] == True:
                                                     d2 = validar_opcion(
                                                         1,
                                                         2,
-                                                        "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
+                                                        "estas segur@ del tamaño de la malteada\n1. Estoy segur@ \n2. Quiero cambiar el tamaño de mi malteada \nIngrese aqui: ",
                                                     )
                                                     if d2 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño_v,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent1 = False
-                                                        cent2 = False
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "2":
-                                                            labrando = False
-                                        else:
-                                            print(
-                                                "El siguiente tipo no se encuentra disponible:",
-                                                tamaño_v,
-                                            )
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-                    elif d == "5":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de malteadas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent1 = True
-                                while cent1 == True:
-                                    for i in tamaños_malteadas:
-                                        valor1, valor2 = tamaños_malteadas[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3} ".format(
-                                                i,
-                                                valor1,
-                                                valor2,
-                                                tamaños_malteadas[i][2],
-                                            )
-                                        )
-                                    print(n_malteadas, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1,
-                                        n_malteadas,
-                                        "que tamaño de malteada desea?: ",
-                                    )
-                                    if tamaño_h == str(n_malteadas):
-                                        cent1 = False
-                                    else:
-                                        tamaño_v, precio = tamaños_malteadas[tamaño_h][
-                                            0
-                                        ]
-                                        if tamaños_malteadas[tamaño_h][1] == True:
-                                            d2 = validar_opcion(
-                                                1,
-                                                2,
-                                                "estas segur@ del tamaño de la malteada\n1. Estoy segur@ \n2. Quiero cambiar el tamaño de mi malteada \nIngrese aqui: ",
-                                            )
-                                            if d2 == "1":
-                                                cent2 = True
-                                                while cent2 == True:
-                                                    (
-                                                        tamaño_v,
-                                                        precio,
-                                                    ) = tamaños_malteadas[tamaño_h][0]
-                                                    sabor_elegido = []
-                                                    print("sabores de helado")
-                                                    Sabor_helados()
+                                                        cent2 = True
+                                                        while cent2 == True:
+                                                            (
+                                                                tamaño_v,
+                                                                precio,
+                                                            ) = tamaños_malteadas[tamaño_h][0]
+                                                            sabor_elegido = []
+                                                            print("sabores de helado")
+                                                            Sabor_helados()
 
-                                                    sabor = validar_opcion(
-                                                        1,
-                                                        22,
-                                                        "Que sabor de helado desea la malteada: ",
-                                                    )
-                                                    sabor_elegido.append(
-                                                        sabores[sabor])
-                                                    d2 = validar_opcion(
-                                                        1,
-                                                        2,
-                                                        "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
-                                                    )
-                                                    if d2 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño_v,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent1 = False
-                                                        cent2 = False
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "2":
-                                                            labrando = False
-                                        else:
-                                            print(
-                                                "el siguiente tamaño de malteada no se encuentra disponible:",
-                                                tamaño_v,
-                                            )
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-                    elif d == "6":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de litro de helado o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent1 = True
-                                while cent1 == True:
-                                    for i in tamaños_litro_helado:
-                                        valor1, valor2 = tamaños_litro_helado[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i,
-                                                valor1,
-                                                valor2,
-                                                tamaños_litro_helado[i][2],
-                                            )
-                                        )
-                                    print(n_litro_helado, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1,
-                                        n_litro_helado,
-                                        "que tamaño de litro(s) desea?:",
-                                    )
-                                    if tamaño_h == str(n_litro_helado):
-                                        cent1 = False
-                                    else:
-                                        tamaño_v, precio = tamaños_litro_helado[
-                                            tamaño_h
-                                        ][0]
-                                        if tamaños_litro_helado[tamaño_h][1] == True:
-                                            d2 = validar_opcion(
-                                                1,
-                                                2,
-                                                "Estas segur@ de tu tipo de litro(s) de helado o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:  ",
-                                            )
-                                            if d2 == "1":
-                                                tamaño_v, precio = tamaños_litro_helado[
-                                                    tamaño_h
-                                                ][0]
-                                                cent2 = True
-                                                while cent2 == True:
-                                                    sabor_elegido = []
-                                                    print("sabores de helado")
-                                                    Sabor_helados()
-
-                                                    sabor = validar_opcion(
-                                                        1,
-                                                        22,
-                                                        "Que sabor de helado desea en el litro de helado: ",
-                                                    )
-                                                    sabor_elegido.append(
-                                                        sabores[sabor])
-                                                    d2 = validar_opcion(
-                                                        1,
-                                                        2,
-                                                        "estas segur@ del sabor del helado?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui: ",
-                                                    )
-                                                    if d2 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño_v,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent2 = False
-                                                        cent1 = False
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "2":
-                                                            labrando = False
-
-                                        else:
-                                            print(
-                                                "el siguiente tamaño de litro(s) de helado no se encuentra disponible:",
-                                                tamaño_v,
-                                            )
-
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-                    elif d == "7":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de ensalada de frutas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent1 = True
-                                while cent1 == True:
-                                    for i in tamaños_ensalada_frutas:
-                                        valor1, valor2 = tamaños_ensalada_frutas[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i,
-                                                valor1,
-                                                valor2,
-                                                tamaños_ensalada_frutas[i][2],
-                                            )
-                                        )
-                                    print(n_frutas, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1,
-                                        n_frutas,
-                                        "que tamaño de ensalada de frutas desea?:  ",
-                                    )
-                                    if tamaño_h == str(n_frutas):
-                                        cent1 = False
-                                    else:
-                                        tamaño_v, precio = tamaños_ensalada_frutas[
-                                            tamaño_h
-                                        ][0]
-                                        if tamaños_ensalada_frutas[tamaño_h][1] == True:
-                                            if tamaño_h == "3" or tamaño_h == "1":
-                                                d2 = validar_opcion(
-                                                    1,
-                                                    2,
-                                                    "estas segur@ del tipo de ensalada de frutas?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de ensalada \nIngrese aqui: ",
-                                                )
-                                                if d2 == "1":
-                                                    cent2 = True
-                                                    while cent2 == True:
-                                                        (
-                                                            tamaño_v,
-                                                            precio,
-                                                        ) = tamaños_ensalada_frutas[
-                                                            tamaño_h
-                                                        ][
-                                                            0
-                                                        ]
-                                                        sabor_elegido = []
-                                                        print(
-                                                            "Sabores de helado")
-                                                        Sabor_helados()
-                                                        for z in range(0, 2):
                                                             sabor = validar_opcion(
                                                                 1,
                                                                 22,
-                                                                "Que sabor de helado desea en la ensalada de frutas: ",
+                                                                "Que sabor de helado desea la malteada: ",
                                                             )
                                                             sabor_elegido.append(
-                                                                sabores[sabor]
+                                                                sabores[sabor])
+                                                            d2 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
                                                             )
+                                                            if d2 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño_v,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent1 = False
+                                                                cent2 = False
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "2":
+                                                                    labrando = False
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño de malteada no se encuentra disponible:",
+                                                        tamaño_v,
+                                                    )
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+                            elif d == "6":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de litro de helado o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent1 = True
+                                        while cent1 == True:
+                                            for i in tamaños_litro_helado:
+                                                valor1, valor2 = tamaños_litro_helado[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i,
+                                                        valor1,
+                                                        valor2,
+                                                        tamaños_litro_helado[i][2],
+                                                    )
+                                                )
+                                            print(n_litro_helado, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1,
+                                                n_litro_helado,
+                                                "que tamaño de litro(s) desea?:",
+                                            )
+                                            if tamaño_h == str(n_litro_helado):
+                                                cent1 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_litro_helado[
+                                                    tamaño_h
+                                                ][0]
+                                                if tamaños_litro_helado[tamaño_h][1] == True:
+                                                    d2 = validar_opcion(
+                                                        1,
+                                                        2,
+                                                        "Estas segur@ de tu tipo de litro(s) de helado o deseas cambiar??\n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:  ",
+                                                    )
+                                                    if d2 == "1":
+                                                        tamaño_v, precio = tamaños_litro_helado[
+                                                            tamaño_h
+                                                        ][0]
+                                                        cent2 = True
+                                                        while cent2 == True:
+                                                            sabor_elegido = []
+                                                            print("sabores de helado")
+                                                            Sabor_helados()
+
+                                                            sabor = validar_opcion(
+                                                                1,
+                                                                22,
+                                                                "Que sabor de helado desea en el litro de helado: ",
+                                                            )
+                                                            sabor_elegido.append(
+                                                                sabores[sabor])
+                                                            d2 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "estas segur@ del sabor del helado?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui: ",
+                                                            )
+                                                            if d2 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño_v,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent2 = False
+                                                                cent1 = False
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "2":
+                                                                    labrando = False
+
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño de litro(s) de helado no se encuentra disponible:",
+                                                        tamaño_v,
+                                                    )
+
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+                            elif d == "7":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de ensalada de frutas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent1 = True
+                                        while cent1 == True:
+                                            for i in tamaños_ensalada_frutas:
+                                                valor1, valor2 = tamaños_ensalada_frutas[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i,
+                                                        valor1,
+                                                        valor2,
+                                                        tamaños_ensalada_frutas[i][2],
+                                                    )
+                                                )
+                                            print(n_frutas, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1,
+                                                n_frutas,
+                                                "que tamaño de ensalada de frutas desea?:  ",
+                                            )
+                                            if tamaño_h == str(n_frutas):
+                                                cent1 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_ensalada_frutas[
+                                                    tamaño_h
+                                                ][0]
+                                                if tamaños_ensalada_frutas[tamaño_h][1] == True:
+                                                    if tamaño_h == "3" or tamaño_h == "1":
                                                         d2 = validar_opcion(
                                                             1,
                                                             2,
-                                                            "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
+                                                            "estas segur@ del tipo de ensalada de frutas?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de ensalada \nIngrese aqui: ",
                                                         )
                                                         if d2 == "1":
+                                                            cent2 = True
+                                                            while cent2 == True:
+                                                                (
+                                                                    tamaño_v,
+                                                                    precio,
+                                                                ) = tamaños_ensalada_frutas[
+                                                                    tamaño_h
+                                                                ][
+                                                                    0
+                                                                ]
+                                                                sabor_elegido = []
+                                                                print(
+                                                                    "Sabores de helado")
+                                                                Sabor_helados()
+                                                                for z in range(0, 2):
+                                                                    sabor = validar_opcion(
+                                                                        1,
+                                                                        22,
+                                                                        "Que sabor de helado desea en la ensalada de frutas: ",
+                                                                    )
+                                                                    sabor_elegido.append(
+                                                                        sabores[sabor]
+                                                                    )
+                                                                d2 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "estas segur@ de los sabores de helado?\n1. Estoy segur@ \n2. Quiero cambiar mis sabores \nIngrese aqui: ",
+                                                                )
+                                                                if d2 == "1":
+                                                                    agregar = {
+                                                                        "tipo": tipos[d],
+                                                                        "tamaño": tamaño_v,
+                                                                        "sabor": sabor_elegido,
+                                                                        "precio": precio,
+                                                                    }
+                                                                    total = (
+                                                                        total
+                                                                        + agregar["precio"]
+                                                                    )
+                                                                    dicTotal = {}
+                                                                    dicTotal["Total"] = total
+                                                                    factura_temporal.append(
+                                                                        agregar
+                                                                    )
+                                                                    cent1 = False
+                                                                    cent2 = False
+                                                                    d3 = validar_opcion(
+                                                                        1,
+                                                                        2,
+                                                                        "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                    )
+                                                                    if d3 == "2":
+                                                                        labrando = False
+
+                                                    elif tamaño_h == "2":
+                                                        d2 = validar_opcion(
+                                                            1,
+                                                            2,
+                                                            "estas segur@ del tipo de ensalada de frutas?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de ensalada \nIngrese aqui: ",
+                                                        )
+                                                        if d2 == "1":
+                                                            (
+                                                                tamaño_v,
+                                                                precio,
+                                                            ) = tamaños_ensalada_frutas[
+                                                                tamaño_h
+                                                            ][
+                                                                0
+                                                            ]
+                                                            sabor_elegido = [
+                                                                "Ensalada de frutas sin helado"
+                                                            ]
+
                                                             agregar = {
                                                                 "tipo": tipos[d],
                                                                 "tamaño": tamaño_v,
                                                                 "sabor": sabor_elegido,
                                                                 "precio": precio,
                                                             }
-                                                            total = (
-                                                                total
-                                                                + agregar["precio"]
-                                                            )
+                                                            total = total + \
+                                                                agregar["precio"]
                                                             dicTotal = {}
                                                             dicTotal["Total"] = total
                                                             factura_temporal.append(
-                                                                agregar
-                                                            )
+                                                                agregar)
                                                             cent1 = False
                                                             cent2 = False
                                                             d3 = validar_opcion(
@@ -2778,106 +2865,469 @@ while True:
                                                             )
                                                             if d3 == "2":
                                                                 labrando = False
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño de ensalada de frutas no se encuentra disponible en este momento:",
+                                                        tamaño_v,
+                                                    )
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
 
-                                            elif tamaño_h == "2":
+                            elif d == "8":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de fresas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent2 = True
+                                        while cent2 == True:
+                                            for i in tamaños_fresas:
+                                                valor1, valor2 = tamaños_fresas[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i, valor1, valor2, tamaños_fresas[i][2]
+                                                    )
+                                                )
+                                            print(n_fresas, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1, n_fresas, "que tipo de  fresas desea?:  "
+                                            )
+                                            if tamaño_h == str(n_fresas):
+                                                cent2 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_fresas[tamaño_h][0]
+                                                if tamaños_fresas[tamaño_h][1] == True:
+                                                    sabor_elegido = []
+                                                    sabor_fresas_crema = [
+                                                        "Fresas con crema"]
+                                                    if tamaño_h == "1":
+                                                        d2 = validar_opcion(
+                                                            1,
+                                                            2,
+                                                            "estas segur@ del tipo de fresa?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de fresa \nIngrese aqui: ",
+                                                        )
+                                                        if d2 == "1":
+                                                            agregar = {
+                                                                "tipo": tipos[d],
+                                                                "tamaño": tamaño_v,
+                                                                "sabor": sabor_fresas_crema,
+                                                                "precio": precio,
+                                                            }
+                                                            total = total + \
+                                                                agregar["precio"]
+                                                            dicTotal = {}
+                                                            dicTotal["Total"] = total
+                                                            factura_temporal.append(
+                                                                agregar)
+                                                            cent = False
+                                                            cent2 = False
+                                                            d3 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                            )
+                                                            if d3 == "2":
+                                                                labrando = False
+                                                                cent2 = False
+
+                                                    elif tamaño_h == "2":
+                                                        d2 = validar_opcion(
+                                                            1,
+                                                            2,
+                                                            "estas segur@ del tipo de fresa?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de fresa \nIngrese aqui: ",
+                                                        )
+                                                        if d2 == "1":
+                                                            cent3 = True
+                                                            while cent3 == True:
+                                                                Sabor_helados()
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea en las fresas: ",
+                                                                )
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "estas segur@ del sabor de helado??\n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "1":
+                                                                    sabor_elegido.append(
+                                                                        sabores[sabor]
+                                                                    )
+
+                                                                    agregar = {
+                                                                        "tipo": tipos[d],
+                                                                        "tamaño": tamaño_v,
+                                                                        "sabor": sabor_elegido,
+                                                                        "precio": precio,
+                                                                    }
+                                                                    total = (
+                                                                        total
+                                                                        + agregar["precio"]
+                                                                    )
+                                                                    dicTotal = {}
+                                                                    dicTotal["Total"] = total
+                                                                    factura_temporal.append(
+                                                                        agregar
+                                                                    )
+                                                                    cent = False
+                                                                    cent2 = False
+                                                                    d3 = validar_opcion(
+                                                                        1,
+                                                                        2,
+                                                                        "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                    )
+                                                                    cent2 = False
+                                                                    cent3 = False
+                                                                    if d3 == "2":
+                                                                        labrando = False
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño de fresas con crema no se encuentra disponible",
+                                                        tamaño_v,
+                                                    )
+
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+                            elif d == "9":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de copas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent2 = True
+                                        while cent2 == True:
+                                            print("Tipos de copas:")
+                                            for i in tamaños_copas:
+                                                valor1, valor2 = tamaños_copas[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3} ".format(
+                                                        i, valor1, valor2, tamaños_copas[i][2]
+                                                    )
+                                                )
+                                            print(n_copas, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1, n_copas, "Que tipo deseas elegir: "
+                                            )
+                                            if tamaño_h == str(n_copas):
+                                                cent2 = False
+                                            else:
+                                                tamaño, precio = tamaños_copas[tamaño_h][0]
+                                                if tamaños_copas[tamaño_h][1] == True:
+                                                    d3 = validar_opcion(
+                                                        1,
+                                                        2,
+                                                        "estas seguro del tipo de copa o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi copa \nIngrese aqui: ",
+                                                    )
+                                                    if d3 == "1":
+                                                        tamaño, precio = tamaños_copas[
+                                                            tamaño_h
+                                                        ][0]
+                                                        bolas = cantidad_bolas[tamaño]
+                                                        cent = True
+                                                        while cent == True:
+                                                            sabor_elegido = []
+                                                            print("sabores de helados")
+                                                            Sabor_helados()
+                                                            for z in range(0, bolas):
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea agregar: ",
+                                                                )
+                                                                sabor_elegido.append(
+                                                                    sabores[sabor]
+                                                                )
+                                                            d2 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
+                                                            )
+                                                            if d2 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent = False
+                                                                cent2 = False
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "2":
+                                                                    labrando = False
+                                                                    cent2 = False
+                                                else:
+                                                    print(
+                                                        "la siguiente copa no se encuentra disponible en este momento:",
+                                                        tamaño,
+                                                    )
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+
+                            elif d == "10":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de banana split o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent2 = True
+                                        while cent2 == True:
+                                            for i in tamaños_banana_split:
+                                                valor1, valor2 = tamaños_banana_split[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i,
+                                                        valor1,
+                                                        valor2,
+                                                        tamaños_banana_split[i][2],
+                                                    )
+                                                )
+                                            tamaño_h = validar_opcion(
+                                                1,
+                                                2,
+                                                "ingrese 2 para volver: \nque tamaño de banana split desea?: ",
+                                            )
+                                            if tamaño_h == "2":
+                                                cent2 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_banana_split[
+                                                    tamaño_h
+                                                ][0]
+                                                if tamaños_banana_split[tamaño_h][1] == True:
+                                                    d2 = validar_opcion(
+                                                        1,
+                                                        2,
+                                                        "Estas segur@ de tu tipo de de banana split? \n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:",
+                                                    )
+                                                    if d2 == "1":
+                                                        tamaño_v, precio = tamaños_banana_split[
+                                                            tamaño_h
+                                                        ][0]
+                                                        cent = True
+                                                        while cent == True:
+                                                            print("Sabores de helados")
+                                                            Sabor_helados()
+                                                            sabor_elegido = []
+                                                            for z in range(0, 2):
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea en el banana split :",
+                                                                )
+                                                                sabor_elegido.append(
+                                                                    sabores[sabor]
+                                                                )
+                                                            d2 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
+                                                            )
+                                                            if d2 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño_v,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent = False
+                                                                cent2 = False
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "2":
+                                                                    labrando = False
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño de banan split no se encuentra disponible: ",
+                                                        tamaño_v,
+                                                    )
+
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+
+                                    tamaños_brownie
+                            elif d == "11":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de brownies o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent2 = True
+                                        while cent2 == True:
+                                            for i in tamaños_brownie:
+                                                valor1, valor2 = tamaños_brownie[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i, valor1, valor2, tamaños_brownie[i][2]
+                                                    )
+                                                )
+                                            print(n_brownie, "para salir")
+                                            tamaño_h = validar_opcion(
+                                                1, n_brownie, "que tamaño de brownie desea?: "
+                                            )
+                                            if tamaño_h == str(n_brownie):
+                                                cent2 = False
+                                            else:
+                                                tamaño_v, precio = tamaños_brownie[tamaño_h][0]
+                                                if tamaños_brownie[tamaño_h][1] == True:
+                                                    d2 = validar_opcion(
+                                                        1,
+                                                        2,
+                                                        "Estas segur@ de tu tipo de de banana split? \n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:",
+                                                    )
+                                                    if d2 == "1":
+                                                        tamaño_v, precio = tamaños_brownie[
+                                                            tamaño_h
+                                                        ][0]
+                                                        cent = True
+                                                        while cent == True:
+                                                            print("Sabores de helados")
+                                                            Sabor_helados()
+                                                            sabor_elegido = []
+                                                            for z in range(0, 1):
+                                                                sabor = validar_opcion(
+                                                                    1,
+                                                                    22,
+                                                                    "Que sabor de helado desea en el banana split :",
+                                                                )
+                                                                sabor_elegido.append(
+                                                                    sabores[sabor]
+                                                                )
+                                                            d2 = validar_opcion(
+                                                                1,
+                                                                2,
+                                                                "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
+                                                            )
+                                                            if d2 == "1":
+                                                                agregar = {
+                                                                    "tipo": tipos[d],
+                                                                    "tamaño": tamaño_v,
+                                                                    "sabor": sabor_elegido,
+                                                                    "precio": precio,
+                                                                }
+
+                                                                total = (
+                                                                    total +
+                                                                    agregar["precio"]
+                                                                )
+                                                                dicTotal = {}
+                                                                dicTotal["Total"] = total
+                                                                factura_temporal.append(
+                                                                    agregar)
+                                                                cent = False
+                                                                cent2 = False
+                                                                d3 = validar_opcion(
+                                                                    1,
+                                                                    2,
+                                                                    "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                                )
+                                                                if d3 == "2":
+                                                                    labrando = False
+
+                                                else:
+                                                    print(
+                                                        "el siguiente tamaño de banan split no se encuentra disponible: ",
+                                                        tamaño_v,
+                                                    )
+                                                    cent2 = False
+
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
+                                    )
+                            elif d == "12":
+                                if tipos2[d][1] == True:
+                                    d1 = validar_opcion(
+                                        1,
+                                        2,
+                                        "Deseas continuar en la seccion de paletas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
+                                    )
+                                    if d1 == "1":
+                                        cent2 = True
+                                        while cent2 == True:
+                                            print("sabores paletas: ")
+                                            for i in sabores_paletas_base:
+                                                valor1, valor2 = sabores_paletas_base[i][0]
+                                                print(
+                                                    "{0}. {1} {2} {3}".format(
+                                                        i,
+                                                        valor1,
+                                                        valor2,
+                                                        sabores_paletas_base[i][2],
+                                                    )
+                                                )
+                                            sabor_elegido = []
+                                            print(n_paletas, "para volver al menu")
+                                            tamaño_h = validar_opcion(
+                                                1, n_paletas, "que sabor de la paleta desea?: "
+                                            )
+                                            if tamaño_h != str(n_paletas):
+                                                tamaño_v, precio = sabores_paletas_base[
+                                                    tamaño_h
+                                                ][0]
+                                                sabor_elegido.append(
+                                                    sabores_paletas[tamaño_h])
                                                 d2 = validar_opcion(
                                                     1,
                                                     2,
-                                                    "estas segur@ del tipo de ensalada de frutas?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de ensalada \nIngrese aqui: ",
+                                                    "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
                                                 )
                                                 if d2 == "1":
-                                                    (
-                                                        tamaño_v,
-                                                        precio,
-                                                    ) = tamaños_ensalada_frutas[
-                                                        tamaño_h
-                                                    ][
-                                                        0
-                                                    ]
-                                                    sabor_elegido = [
-                                                        "Ensalada de frutas sin helado"
-                                                    ]
-
                                                     agregar = {
                                                         "tipo": tipos[d],
                                                         "tamaño": tamaño_v,
                                                         "sabor": sabor_elegido,
                                                         "precio": precio,
                                                     }
-                                                    total = total + \
-                                                        agregar["precio"]
-                                                    dicTotal = {}
-                                                    dicTotal["Total"] = total
-                                                    factura_temporal.append(
-                                                        agregar)
-                                                    cent1 = False
-                                                    cent2 = False
-                                                    d3 = validar_opcion(
-                                                        1,
-                                                        2,
-                                                        "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                    )
-                                                    if d3 == "2":
-                                                        labrando = False
-                                        else:
-                                            print(
-                                                "el siguiente tamaño de ensalada de frutas no se encuentra disponible en este momento:",
-                                                tamaño_v,
-                                            )
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
 
-                    elif d == "8":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de fresas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent2 = True
-                                while cent2 == True:
-                                    for i in tamaños_fresas:
-                                        valor1, valor2 = tamaños_fresas[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i, valor1, valor2, tamaños_fresas[i][2]
-                                            )
-                                        )
-                                    print(n_fresas, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1, n_fresas, "que tipo de  fresas desea?:  "
-                                    )
-                                    if tamaño_h == str(n_fresas):
-                                        cent2 = False
-                                    else:
-                                        tamaño_v, precio = tamaños_fresas[tamaño_h][0]
-                                        if tamaños_fresas[tamaño_h][1] == True:
-                                            sabor_elegido = []
-                                            sabor_fresas_crema = [
-                                                "Fresas con crema"]
-                                            if tamaño_h == "1":
-                                                d2 = validar_opcion(
-                                                    1,
-                                                    2,
-                                                    "estas segur@ del tipo de fresa?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de fresa \nIngrese aqui: ",
-                                                )
-                                                if d2 == "1":
-                                                    agregar = {
-                                                        "tipo": tipos[d],
-                                                        "tamaño": tamaño_v,
-                                                        "sabor": sabor_fresas_crema,
-                                                        "precio": precio,
-                                                    }
-                                                    total = total + \
-                                                        agregar["precio"]
+                                                    total = total + agregar["precio"]
                                                     dicTotal = {}
                                                     dicTotal["Total"] = total
-                                                    factura_temporal.append(
-                                                        agregar)
+                                                    factura_temporal.append(agregar)
                                                     cent = False
                                                     cent2 = False
                                                     d3 = validar_opcion(
@@ -2887,444 +3337,170 @@ while True:
                                                     )
                                                     if d3 == "2":
                                                         labrando = False
-                                                        cent2 = False
-
-                                            elif tamaño_h == "2":
-                                                d2 = validar_opcion(
-                                                    1,
-                                                    2,
-                                                    "estas segur@ del tipo de fresa?\n1. Estoy segur@ \n2. Quiero cambiar mi tipo de fresa \nIngrese aqui: ",
-                                                )
-                                                if d2 == "1":
-                                                    cent3 = True
-                                                    while cent3 == True:
-                                                        Sabor_helados()
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea en las fresas: ",
-                                                        )
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "estas segur@ del sabor de helado??\n1. Estoy segur@ \n2. Quiero cambiar mi sabor de helado \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "1":
-                                                            sabor_elegido.append(
-                                                                sabores[sabor]
-                                                            )
-
-                                                            agregar = {
-                                                                "tipo": tipos[d],
-                                                                "tamaño": tamaño_v,
-                                                                "sabor": sabor_elegido,
-                                                                "precio": precio,
-                                                            }
-                                                            total = (
-                                                                total
-                                                                + agregar["precio"]
-                                                            )
-                                                            dicTotal = {}
-                                                            dicTotal["Total"] = total
-                                                            factura_temporal.append(
-                                                                agregar
-                                                            )
-                                                            cent = False
-                                                            cent2 = False
-                                                            d3 = validar_opcion(
-                                                                1,
-                                                                2,
-                                                                "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                            )
-                                                            cent2 = False
-                                                            cent3 = False
-                                                            if d3 == "2":
-                                                                labrando = False
-                                        else:
-                                            print(
-                                                "el siguiente tamaño de fresas con crema no se encuentra disponible",
-                                                tamaño_v,
-                                            )
-
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-                    elif d == "9":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de copas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent2 = True
-                                while cent2 == True:
-                                    print("Tipos de copas:")
-                                    for i in tamaños_copas:
-                                        valor1, valor2 = tamaños_copas[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3} ".format(
-                                                i, valor1, valor2, tamaños_copas[i][2]
-                                            )
-                                        )
-                                    print(n_copas, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1, n_copas, "Que tipo deseas elegir: "
+                                            else:
+                                                cent2 = False
+                                else:
+                                    print(
+                                        "el siguiente producto no esta disponible en este momento:",
+                                        tipos2[d][0],
                                     )
-                                    if tamaño_h == str(n_copas):
-                                        cent2 = False
-                                    else:
-                                        tamaño, precio = tamaños_copas[tamaño_h][0]
-                                        if tamaños_copas[tamaño_h][1] == True:
-                                            d3 = validar_opcion(
-                                                1,
-                                                2,
-                                                "estas seguro del tipo de copa o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi copa \nIngrese aqui: ",
-                                            )
-                                            if d3 == "1":
-                                                tamaño, precio = tamaños_copas[
-                                                    tamaño_h
-                                                ][0]
-                                                bolas = cantidad_bolas[tamaño]
-                                                cent = True
-                                                while cent == True:
-                                                    sabor_elegido = []
-                                                    print("sabores de helados")
-                                                    Sabor_helados()
-                                                    for z in range(0, bolas):
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea agregar: ",
-                                                        )
-                                                        sabor_elegido.append(
-                                                            sabores[sabor]
-                                                        )
-                                                    d2 = validar_opcion(
-                                                        1,
-                                                        2,
-                                                        "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
+
+                            elif d == "13":
+                                if len(subcategorias_nuevas) == 0:
+                                    print(
+                                        "Esta categoría no tiene productos"
+                                    )
+                                else:
+                                    contSubCategoria = 1
+                                    subcategoriasHabilitadas = []
+                                    opcionesSubcategorias = ""
+                                    for i in subcategorias_nuevas:
+                                        subcategoriasHabilitadas.append(
+                                            [
+                                                subcategorias_nuevas[i][
+                                                    0
+                                                ]
+                                                + " "
+                                                + subcategorias_nuevas[
+                                                    i
+                                                ][2]
+                                            ]
+                                        )
+                                        contSubCategoria += 1
+                                    for i, subCategoria in enumerate(
+                                        subcategoriasHabilitadas
+                                    ):
+                                        nombreSubCategoria = (
+                                            subCategoria[0]
+                                        )
+                                        opcionesSubcategorias += f"{i+1}. {nombreSubCategoria.capitalize()}\n"
+                                    preguntaSubCategoria = input(
+                                        opcionesSubcategorias
+                                        + "Elige una opción: "
+                                    )
+                                    if (
+                                        preguntaSubCategoria.isdigit()
+                                        and int(preguntaSubCategoria)
+                                        > 0
+                                        and int(preguntaSubCategoria)
+                                        <= len(subcategoriasHabilitadas)
+                                    ):
+                                        if (
+                                            len(
+                                                subcategorias_nuevas[
+                                                    int(
+                                                        preguntaSubCategoria
                                                     )
-                                                    if d2 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent = False
-                                                        cent2 = False
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "2":
-                                                            labrando = False
-                                                            cent2 = False
-                                        else:
+                                                ][3]
+                                            )
+                                            == 0
+                                        ):
                                             print(
-                                                "la siguiente copa no se encuentra disponible en este momento:",
-                                                tamaño,
+                                                "Esta subcategoria no tiene productos"
                                             )
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-
-                    elif d == "10":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de banana split o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent2 = True
-                                while cent2 == True:
-                                    for i in tamaños_banana_split:
-                                        valor1, valor2 = tamaños_banana_split[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i,
-                                                valor1,
-                                                valor2,
-                                                tamaños_banana_split[i][2],
-                                            )
-                                        )
-                                    tamaño_h = validar_opcion(
-                                        1,
-                                        2,
-                                        "ingrese 2 para volver: \nque tamaño de banana split desea?: ",
-                                    )
-                                    if tamaño_h == "2":
-                                        cent2 = False
-                                    else:
-                                        tamaño_v, precio = tamaños_banana_split[
-                                            tamaño_h
-                                        ][0]
-                                        if tamaños_banana_split[tamaño_h][1] == True:
-                                            d2 = validar_opcion(
-                                                1,
-                                                2,
-                                                "Estas segur@ de tu tipo de de banana split? \n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:",
-                                            )
-                                            if d2 == "1":
-                                                tamaño_v, precio = tamaños_banana_split[
-                                                    tamaño_h
-                                                ][0]
-                                                cent = True
-                                                while cent == True:
-                                                    print("Sabores de helados")
-                                                    Sabor_helados()
-                                                    sabor_elegido = []
-                                                    for z in range(0, 2):
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea en el banana split :",
-                                                        )
-                                                        sabor_elegido.append(
-                                                            sabores[sabor]
-                                                        )
-                                                    d2 = validar_opcion(
-                                                        1,
-                                                        2,
-                                                        "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
+                                        else:
+                                            modificarProductosSubcategoria(
+                                                subcategorias_nuevas[
+                                                    int(
+                                                        preguntaSubCategoria
                                                     )
-                                                    if d2 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño_v,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent = False
-                                                        cent2 = False
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "2":
-                                                            labrando = False
-                                        else:
-                                            print(
-                                                "el siguiente tamaño de banan split no se encuentra disponible: ",
-                                                tamaño_v,
+                                                ][3]
                                             )
-
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-
-                            tamaños_brownie
-                    elif d == "11":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de brownies o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent2 = True
-                                while cent2 == True:
-                                    for i in tamaños_brownie:
-                                        valor1, valor2 = tamaños_brownie[i][0]
-                                        print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i, valor1, valor2, tamaños_brownie[i][2]
-                                            )
-                                        )
-                                    print(n_brownie, "para salir")
-                                    tamaño_h = validar_opcion(
-                                        1, n_brownie, "que tamaño de brownie desea?: "
-                                    )
-                                    if tamaño_h == str(n_brownie):
-                                        cent2 = False
                                     else:
-                                        tamaño_v, precio = tamaños_brownie[tamaño_h][0]
-                                        if tamaños_brownie[tamaño_h][1] == True:
-                                            d2 = validar_opcion(
-                                                1,
-                                                2,
-                                                "Estas segur@ de tu tipo de de banana split? \n1. Estoy segur@ \n2. Quiero cambiar \nIngrese aqui:",
-                                            )
-                                            if d2 == "1":
-                                                tamaño_v, precio = tamaños_brownie[
-                                                    tamaño_h
-                                                ][0]
-                                                cent = True
-                                                while cent == True:
-                                                    print("Sabores de helados")
-                                                    Sabor_helados()
-                                                    sabor_elegido = []
-                                                    for z in range(0, 1):
-                                                        sabor = validar_opcion(
-                                                            1,
-                                                            22,
-                                                            "Que sabor de helado desea en el banana split :",
-                                                        )
-                                                        sabor_elegido.append(
-                                                            sabores[sabor]
-                                                        )
-                                                    d2 = validar_opcion(
-                                                        1,
-                                                        2,
-                                                        "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
-                                                    )
-                                                    if d2 == "1":
-                                                        agregar = {
-                                                            "tipo": tipos[d],
-                                                            "tamaño": tamaño_v,
-                                                            "sabor": sabor_elegido,
-                                                            "precio": precio,
-                                                        }
-
-                                                        total = (
-                                                            total +
-                                                            agregar["precio"]
-                                                        )
-                                                        dicTotal = {}
-                                                        dicTotal["Total"] = total
-                                                        factura_temporal.append(
-                                                            agregar)
-                                                        cent = False
-                                                        cent2 = False
-                                                        d3 = validar_opcion(
-                                                            1,
-                                                            2,
-                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                                        )
-                                                        if d3 == "2":
-                                                            labrando = False
-
-                                        else:
-                                            print(
-                                                "el siguiente tamaño de banan split no se encuentra disponible: ",
-                                                tamaño_v,
-                                            )
-                                            cent2 = False
-
-                        else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
-                    elif d == "12":
-                        if tipos2[d][1] == True:
-                            d1 = validar_opcion(
-                                1,
-                                2,
-                                "Deseas continuar en la seccion de paletas o regresar al menu de productos?\n1. Continuar \n2. Regresar \nIngrese aqui:  ",
-                            )
-                            if d1 == "1":
-                                cent2 = True
-                                while cent2 == True:
-                                    print("sabores paletas: ")
-                                    for i in sabores_paletas_base:
-                                        valor1, valor2 = sabores_paletas_base[i][0]
                                         print(
-                                            "{0}. {1} {2} {3}".format(
-                                                i,
-                                                valor1,
-                                                valor2,
-                                                sabores_paletas_base[i][2],
-                                            )
+                                            "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
                                         )
-                                    sabor_elegido = []
-                                    print(n_paletas, "para volver al menu")
-                                    tamaño_h = validar_opcion(
-                                        1, n_paletas, "que sabor de la paleta desea?: "
-                                    )
-                                    if tamaño_h != str(n_paletas):
-                                        tamaño_v, precio = sabores_paletas_base[
-                                            tamaño_h
-                                        ][0]
-                                        sabor_elegido.append(
-                                            sabores_paletas[tamaño_h])
-                                        d2 = validar_opcion(
-                                            1,
-                                            2,
-                                            "estas seguro de su sabor o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi sabor \nIngrese aqui:  ",
-                                        )
-                                        if d2 == "1":
-                                            agregar = {
-                                                "tipo": tipos[d],
-                                                "tamaño": tamaño_v,
-                                                "sabor": sabor_elegido,
-                                                "precio": precio,
-                                            }
+                                break
 
-                                            total = total + agregar["precio"]
-                                            dicTotal = {}
-                                            dicTotal["Total"] = total
-                                            factura_temporal.append(agregar)
-                                            cent = False
-                                            cent2 = False
-                                            d3 = validar_opcion(
-                                                1,
-                                                2,
-                                                "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
-                                            )
-                                            if d3 == "2":
-                                                labrando = False
-                                    else:
-                                        cent2 = False
+                            elif d == "14":
+                                labrando = False
+
+                        while True:
+                            preguntaPago=input("1. Caja\n2. Online\n3. Online - Pago en caja\n4. Cancelar orden\nSelecciona una opción de pago: ")
+                            if preguntaPago=="1":
+                                if total != 0:
+                                    Factura_unica.append(contador_general)
+                                    Factura_unica.append(correoUsuario)
+                                    Factura_unica.append(fecha_formateada)
+                                    Factura_unica.append(factura_temporal)
+                                    Factura_unica.append("Caja")
+                                    Factura_unica.append(dicTotal)
+                                    t = threading.Thread(target=agregarFactura, args=(Factura_unica,))
+                                    t.start()
+                                    contador_general += 1
+                                    print(Factura_unica)
+                                break
+                            elif preguntaPago=="2":
+                                if total != 0:
+                                    Factura_unica.append(contador_general)
+                                    Factura_unica.append(correoUsuario)
+                                    Factura_unica.append(fecha_formateada)
+                                    Factura_unica.append(factura_temporal)
+                                    Factura_unica.append("Online")
+                                    Factura_unica.append(dicTotal)
+                                    facturas.append(Factura_unica)
+                                    contador_general += 1
+                                    print(Factura_unica)
+                                break
+                            elif preguntaPago=="3":
+                                if total != 0:
+                                    Factura_unica.append(contador_general)
+                                    Factura_unica.append(correoUsuario)
+                                    Factura_unica.append(fecha_formateada)
+                                    Factura_unica.append(factura_temporal)
+                                    Factura_unica.append("Online - Pago en caja")
+                                    Factura_unica.append(dicTotal)
+                                    t = threading.Thread(target=agregarFactura, args=(Factura_unica,))
+                                    t.start()
+                                    contador_general += 1
+                                    print(Factura_unica)
+                                break
+                            elif preguntaPago=="4":
+                                break
+                            else:
+                                print("Ingrese una opción valida")
+                    if preguntaCajero=="3":
+                        if len(facturasFinalizadas)==0:
+                            print("No hay pedidos por entregar")
                         else:
-                            print(
-                                "el siguiente producto no esta disponible en este momento:",
-                                tipos2[d][0],
-                            )
+                            for factura in facturasFinalizadas:
+                                print("---------------------")
+                                print("N°Factura: ", factura[0])
+                                print("Nombre: ", factura[1])
+                                print("Fecha: ", factura[2])
+                                print("Detalles: ", factura[3])
+                                print("Tipo de pago: ", factura[4])
+                                print("Total: ",factura[-1]["Total"])
+                                print("---------------------")
 
-                    elif d == "13":
-                        print("nuevos productos")
-
-                    elif d == "14":
-                        labrando = False
-
-                if total != 0:
-                    Factura_unica.append(contador_general)
-
-                    Factura_unica.append(correoUsuario)
-
-                    Factura_unica.append(fecha_formateada)
-
-                    Factura_unica.append(factura_temporal)
-
-                    Factura_unica.append(dicTotal)
-
-                    facturas.append(Factura_unica)
-
-                    contador_general += 1
-
-                    print(Factura_unica)
+                            while True:
+                                preguntaPedido = input("¿Qué factura deseas finalizar? (Ingresa el número de factura o selecciona 0 para volver): ")
+                                if preguntaPedido.isdigit():
+                                    preguntaPedido = int(preguntaPedido)
+                                    if preguntaPedido == 0:
+                                        break
+                                    else:
+                                        encontradoPendiente=False
+                                        for facturaP in facturasFinalizadas:
+                                            if facturaP[0]==preguntaPedido:
+                                                encontradoPendiente=True
+                                        if encontradoPendiente==True:
+                                            for i,facturaP in enumerate(facturasFinalizadas):
+                                                if facturaP[0]==preguntaPedido:
+                                                    facturas.append(facturasFinalizadas[i])
+                                                    del facturasFinalizadas[i]
+                                                    print("Pedido Entregado")
+                                            break
+                                        else:
+                                            print("No se encontró el pedido")
+                                else:
+                                    print("Ingresa una opción válida")
+                    if preguntaCajero=="4":
+                        break
             elif i[2] == "usuario":
                 while True:
                     modificar = input(
-                        "1. Desea modificar el usuario o 2. Salir o 3. realizar pedido: ")
+                        "1. Modificar Usuario \n2. Salir\n3. Realizar pedido\n4. Cancelar Pedido\nSelecciona una opción: ")
                     if modificar == "1":
                         r = 1
                         while r == 1:
@@ -3369,7 +3545,6 @@ while True:
                                                     encontrado = True
                                                     if nuevacontra != usuario_info[1]:
                                                         usuario_info[1] = nuevacontra
-                                                        print(usuarios)
                                                         t=2
                                                         r=2
                                                         j=2
@@ -3381,29 +3556,24 @@ while True:
                                             nuevotel = input("Ingrese su nuevo teléfono: ")
                                             if nuevotel.isdigit() and (len(nuevotel) == 10):                            
                                                 if nuevotel in [usuario_info[3][3] for usuario_info in usuarios]:
-                                                    print("El usuario ya esta registrado") 
+                                                    print("El número ya esta registrado") 
                                                 else:   
                                                     for usuario_info in usuarios:
                                                         if nuevotel != usuario_info[3][3]:
                                                             usuario_info[3][3] = nuevotel
-                                                            print(usuarios)
                                                             t=2
                                                             r=2
                                                             g=2
                                                             break
-                                                        
-                                                        else:
-                                                            print("Ya tenía este numero.")
-                                    
-                                        else:
-                                            print("Número inválido. Debe ser un número entero de 10 dígitos.")
+
+                                            else:
+                                                print("Número inválido. Debe ser un número entero de 10 dígitos.")
                                     elif quecosa == "4":
                                         nuevadir = input(
                                             "Ingrese su nueva dirección: ").strip()
                                         for usuario_info in usuarios:
                                             if usuario_info[0].lower() == usuario.lower():
                                                 usuario_info[3][4] = nuevadir
-                                                print(usuarios)
                                                 t=2
                                                 r=2
                                                 break
@@ -4797,63 +4967,215 @@ while True:
                                     )
 
                             elif d == "13":
-                                print("nuevos productos")
-
+                                if len(subcategorias_nuevas) == 0:
+                                    print(
+                                        "Esta categoría no tiene productos"
+                                    )
+                                else:
+                                    contSubCategoria = 1
+                                    subcategoriasHabilitadas = []
+                                    opcionesSubcategorias = ""
+                                    for i in subcategorias_nuevas:
+                                        subcategoriasHabilitadas.append(
+                                            [
+                                                subcategorias_nuevas[i][
+                                                    0
+                                                ]
+                                                + " "
+                                                + subcategorias_nuevas[
+                                                    i
+                                                ][2]
+                                            ]
+                                        )
+                                        contSubCategoria += 1
+                                    for i, subCategoria in enumerate(
+                                        subcategoriasHabilitadas
+                                    ):
+                                        nombreSubCategoria = (
+                                            subCategoria[0]
+                                        )
+                                        opcionesSubcategorias += f"{i+1}. {nombreSubCategoria.capitalize()}\n"
+                                    preguntaSubCategoria = input(
+                                        opcionesSubcategorias
+                                        + "Elige una opción: "
+                                    )
+                                    if (
+                                        preguntaSubCategoria.isdigit()
+                                        and int(preguntaSubCategoria)
+                                        > 0
+                                        and int(preguntaSubCategoria)
+                                        <= len(subcategoriasHabilitadas)
+                                    ):
+                                        if (
+                                            len(
+                                                subcategorias_nuevas[
+                                                    int(
+                                                        preguntaSubCategoria
+                                                    )
+                                                ][3]
+                                            )
+                                            == 0
+                                        ):
+                                            print(
+                                                "Esta subcategoria no tiene productos"
+                                            )
+                                        else:
+                                            if (
+                                                subcategorias_nuevas[
+                                                    int(
+                                                        preguntaSubCategoria
+                                                    )
+                                                ][1]
+                                                == True
+                                            ):
+                                                for (
+                                                    i
+                                                ) in subcategorias_nuevas[
+                                                    int(
+                                                        preguntaSubCategoria
+                                                    )
+                                                ][
+                                                    3
+                                                ]:
+                                                    print(
+                                                        subcategorias_nuevas[
+                                                            int(
+                                                                preguntaSubCategoria
+                                                            )
+                                                        ][
+                                                            3
+                                                        ][
+                                                            i
+                                                        ][
+                                                            0
+                                                        ],
+                                                        " ",
+                                                        subcategorias_nuevas[
+                                                            int(
+                                                                preguntaSubCategoria
+                                                            )
+                                                        ][
+                                                            3
+                                                        ][
+                                                            i
+                                                        ][
+                                                            2
+                                                        ],
+                                                    )
+                                            else:
+                                                print(
+                                                    "Esta subcategoría se encuentra deshabilitada"
+                                                )
+                                    else:
+                                        print(
+                                            "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
+                                        )
+                                break
                             elif d == "14":
                                 labrando = False
                         while True:
-                            preguntaPago=input("1. Caja\n2. Online\n3. Caja - Pagar Online\n4. Online - Pago en caja\n5. Cancelar orden\nSelecciona una opción de pago: ")
+                            preguntaPago=input("1. Caja\n2. Online\n3. Online - Pago en caja\n4. Cancelar orden\nSelecciona una opción de pago: ")
                             if preguntaPago=="1":
                                 if total != 0:
                                     Factura_unica.append(contador_general)
                                     Factura_unica.append(correoUsuario)
                                     Factura_unica.append(fecha_formateada)
                                     Factura_unica.append(factura_temporal)
-                                    Factura_unica.append(dicTotal)
                                     Factura_unica.append("Caja")
-                                    facturas.append(Factura_unica)
-                                    contador_general += 1
+                                    Factura_unica.append(dicTotal)
                                     print(Factura_unica)
+                                    t = threading.Thread(target=agregarFactura, args=(Factura_unica,))
+                                    t.start()
+                                    contador_general += 1
                                 break
-                            if preguntaPago=="2":
+                            elif preguntaPago=="2":
                                 if total != 0:
                                     Factura_unica.append(contador_general)
                                     Factura_unica.append(correoUsuario)
                                     Factura_unica.append(fecha_formateada)
                                     Factura_unica.append(factura_temporal)
-                                    Factura_unica.append(dicTotal)
                                     Factura_unica.append("Online")
+                                    Factura_unica.append(dicTotal)
                                     facturas.append(Factura_unica)
                                     contador_general += 1
-                                    print(Factura_unica)
                                 break
-                            if preguntaPago=="3":
+                            elif preguntaPago=="3":
                                 if total != 0:
                                     Factura_unica.append(contador_general)
                                     Factura_unica.append(correoUsuario)
                                     Factura_unica.append(fecha_formateada)
                                     Factura_unica.append(factura_temporal)
-                                    Factura_unica.append(dicTotal)
-                                    Factura_unica.append("Caja - Pago Online")
-                                    facturas.append(Factura_unica)
-                                    contador_general += 1
-                                    print(Factura_unica)
-                                break
-                            if preguntaPago=="4":
-                                if total != 0:
-                                    Factura_unica.append(contador_general)
-                                    Factura_unica.append(correoUsuario)
-                                    Factura_unica.append(fecha_formateada)
-                                    Factura_unica.append(factura_temporal)
-                                    Factura_unica.append(dicTotal)
                                     Factura_unica.append("Online - Pago en caja")
-                                    facturas.append(Factura_unica)
+                                    Factura_unica.append(dicTotal)
+                                    t = threading.Thread(target=agregarFactura, args=(Factura_unica,))
+                                    t.start()
                                     contador_general += 1
-                                    print(Factura_unica)
                                 break
-                            if preguntaPago=="5":
+                            elif preguntaPago=="4":
                                 break
-                        
+                            else:
+                                print("Ingresa una opcion valida")
+                    elif modificar == "4":
+                        for factura in facturas:
+                            if factura[1] == correoUsuario:
+                                print("---------------------")
+                                print("N°Factura: ", factura[0])
+                                print("Nombre: ", factura[1])
+                                print("Fecha: ", factura[2])
+                                print("Detalles: ", factura[3])
+                                print("Tipo de pago: ", factura[4])
+                                print("Total: ",factura[-1]["Total"])
+                                print("---------------------")
+                        for factura in facturasCreadas:
+                            if factura[1] == correoUsuario:
+                                print("---------------------")
+                                print("N°Factura: ", factura[0])
+                                print("Nombre: ", factura[1])
+                                print("Fecha: ", factura[2])
+                                print("Detalles: ", factura[3])
+                                print("Tipo de pago: ", factura[4])
+                                print("Total: ",factura[-1]["Total"])
+                                print("---------------------")
+                        while True:
+                            preguntaPedido = input("¿Qué pedido deseas cancelar? (Ingresa el número de factura o selecciona 0 para volver): ")
+                            if preguntaPedido.isdigit():
+                                preguntaPedido = int(preguntaPedido)
+                                if preguntaPedido == 0:
+                                    break
+                                else:
+                                    encontradoPendiente=False
+                                    encontradoFacturas=False
+                                    for facturaP in facturasCreadas:
+                                        if facturaP[0]==preguntaPedido:
+                                            encontradoPendiente=True
+                                    for factura in facturas:
+                                        if factura[0]==preguntaPedido:
+                                            encontradoFacturas=True
+                                            
+                                    if encontradoPendiente==True:
+                                        for i,facturaP in enumerate(facturasCreadas):
+                                            if facturaP[0]==preguntaPedido:
+                                                del facturasCreadas[i]
+                                                print("Pedido cancelado")
+                                    if encontradoFacturas==True:
+                                        for usuarioFalla in usuarios:
+                                            if usuarioFalla[0] == correoUsuario:
+                                                print("Se agregó una falla")
+                                                usuarioFalla[4] += 1
+                                                if usuarioFalla[4] == 3:
+                                                    for datos in usuarios:
+                                                        datos[2] = False
+                                                    print("Has sido baneado por superar el límite de cancelación de pedidos")
+                                                    break
+                                        for i, factura in enumerate(facturas):
+                                            if factura[0]==preguntaPedido:
+                                                del facturas[i]
+                                                print("Pedido cancelado")
+                                    if encontradoFacturas==False and encontradoPendiente==False:
+                                        print("No se encontró la factura")
+                            else:
+                                print("Ingresa una opción válida")
+
                     else:
                         print("Por favor ingrese 1 o 2.")
     if not encontrado:
