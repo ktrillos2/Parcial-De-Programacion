@@ -970,6 +970,7 @@ def realizarPedidoSubcategoria(productos):
             and int(preguntaProducto) <= len(productos)
         ):
             productoSeleccionado = list(productos.items())[int(preguntaProducto) - 1]
+            print(productoSeleccionado)
             if productoSeleccionado[1][1]:
                 productosSeleccionados.append(productoSeleccionado)
                 print(
@@ -984,7 +985,6 @@ def realizarPedidoSubcategoria(productos):
                 "Opción inválida. Ingresa un número correspondiente a una opción válida."
             )
 
-    return productosSeleccionados
 
 
 def modificarProductosSubcategoria(productos):
@@ -3437,8 +3437,62 @@ while True:
                                                 "Esta subcategoria no tiene productos"
                                             )
                                         else:
-                                            productoSeleccionadoSubcategoria=realizarPedidoSubcategoria(subcategorias_nuevas[int(preguntaSubCategoria)][3])
-                                            print(productoSeleccionadoSubcategoria)
+                                            if subcategorias_nuevas[int(preguntaSubCategoria)][1] == True:
+                                                contadorProductoSubcategoria=1
+                                                productosHabilitados = []
+                                                opcionesProductos = ""
+                                                for i in subcategorias_nuevas[int(preguntaSubCategoria)][3]:
+                                                    productosHabilitados.append([
+                                                        subcategorias_nuevas[int(preguntaSubCategoria)][3][i][0],
+                                                        " ",
+                                                        subcategorias_nuevas[int(preguntaSubCategoria)][3][i][2]]
+                                                    )
+                                                    contadorProductoSubcategoria+=1
+                                                for i,producto in enumerate(productosHabilitados):
+                                                    nombreProducto = (
+                                                            producto[0][0]
+                                                        )
+                                                    precioProducto=(producto[0][1])
+                                                    opcionesProductos += f"{i+1}. {nombreProducto.capitalize()} - {precioProducto}\n"
+                                                preguntaProducto = input(
+                                                        opcionesProductos
+                                                        + "Elige una opción: "
+                                                        )
+                                                if (preguntaProducto.isdigit()
+                                                    and int(preguntaProducto)
+                                                    > 0
+                                                    and int(preguntaProducto)
+                                                    <= len(productosHabilitados)):
+                                                    d2 = validar_opcion(
+                                                        1,
+                                                        2,
+                                                        "estas seguro de tu eleccion o deseas cambiar?\n1. Estoy segur@ \n2. Quiero cambiar mi producto \nIngrese aqui:  ",
+                                                    )
+                                                    if d2 == "1":
+                                                        agregar = {
+                                                            "tipo": subcategorias_nuevas[int(preguntaSubCategoria)][0],
+                                                            "tamaño": subcategorias_nuevas[int(preguntaSubCategoria)][3]["1"][0],
+                                                            "sabor": subcategorias_nuevas[int(preguntaSubCategoria)][3]["1"][0],
+                                                            "precio": subcategorias_nuevas[int(preguntaSubCategoria)][3]["1"][0][1],
+                                                        }
+
+                                                        total = total + agregar["precio"]
+                                                        dicTotal = {}
+                                                        dicTotal["Total"] = total
+                                                        factura_temporal.append(agregar)
+                                                        cent = False
+                                                        cent2 = False
+                                                        d3 = validar_opcion(
+                                                            1,
+                                                            2,
+                                                            "deseas hacer otro pedido o finalizar con la compra? \n1. Hacer otro pedido \n2. Finalizar con la compra \nIngrese aqui: ",
+                                                        )
+                                                        if d3 == "2":
+                                                            labrando = False
+                                            else:
+                                                print(
+                                                    "Esta subcategoría se encuentra deshabilitada"
+                                                )
                                     else:
                                         print(
                                             "Opción inválida. Por favor, ingresa un número correspondiente a una opción válida."
@@ -3448,50 +3502,17 @@ while True:
                             elif d == "14":
                                 labrando = False
 
-                        while True:
-                            preguntaPago=input("1. Caja\n2. Online\n3. Online - Pago en caja\n4. Cancelar orden\nSelecciona una opción de pago: ")
-                            if preguntaPago=="1":
-                                if total != 0:
-                                    Factura_unica.append(contador_general)
-                                    Factura_unica.append(correoUsuario)
-                                    Factura_unica.append(fecha_formateada)
-                                    Factura_unica.append(factura_temporal)
-                                    Factura_unica.append("Caja")
-                                    Factura_unica.append(dicTotal)
-                                    t = threading.Thread(target=agregarFactura, args=(Factura_unica,))
-                                    t.start()
-                                    contador_general += 1
-                                    print(Factura_unica)
-                                break
-                            elif preguntaPago=="2":
-                                if total != 0:
-                                    Factura_unica.append(contador_general)
-                                    Factura_unica.append(correoUsuario)
-                                    Factura_unica.append(fecha_formateada)
-                                    Factura_unica.append(factura_temporal)
-                                    Factura_unica.append("Online")
-                                    Factura_unica.append(dicTotal)
-                                    facturas.append(Factura_unica)
-                                    contador_general += 1
-                                    print(Factura_unica)
-                                break
-                            elif preguntaPago=="3":
-                                if total != 0:
-                                    Factura_unica.append(contador_general)
-                                    Factura_unica.append(correoUsuario)
-                                    Factura_unica.append(fecha_formateada)
-                                    Factura_unica.append(factura_temporal)
-                                    Factura_unica.append("Online - Pago en caja")
-                                    Factura_unica.append(dicTotal)
-                                    t = threading.Thread(target=agregarFactura, args=(Factura_unica,))
-                                    t.start()
-                                    contador_general += 1
-                                    print(Factura_unica)
-                                break
-                            elif preguntaPago=="4":
-                                break
-                            else:
-                                print("Ingrese una opción valida")
+                        if total != 0:
+                            Factura_unica.append(contador_general)
+                            Factura_unica.append(correoUsuario)
+                            Factura_unica.append(fecha_formateada)
+                            Factura_unica.append(factura_temporal)
+                            Factura_unica.append("Caja")
+                            Factura_unica.append(dicTotal)
+                            t = threading.Thread(target=agregarFactura, args=(Factura_unica,))
+                            t.start()
+                            contador_general += 1
+                            print(Factura_unica)
                     if preguntaCajero=="3":
                         if len(facturasFinalizadas)==0:
                             print("No hay pedidos por entregar")
